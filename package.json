@@ -1,0 +1,12 @@
+{
+  "name": "mini-vue",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/xiaoxiayan/mini-Vue.git",
+  "author": "v_qiwulv <v_qiwulv@tencent.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "jest": "^27.3.1"
+  }
+}
