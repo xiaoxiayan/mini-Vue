@@ -5,6 +5,9 @@
   "repository": "https://github.com/xiaoxiayan/mini-Vue.git",
   "author": "v_qiwulv <v_qiwulv@tencent.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "jest": "^27.3.1"
