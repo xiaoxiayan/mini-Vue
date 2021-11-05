@@ -6,17 +6,23 @@ import { effect } from '../effect'
 describe('effect', () => {
   it('happy path', () => {
     const user = reactive({
-      age: 10
+      age: 10,
+      name: 'zhangsan'
     })
     let nextAge;
+    let newName;
     effect(() => {
       nextAge = user.age + 1
     })
+    effect(() => {
+      newName = user.name + '2'
+    })
     expect(nextAge).toBe(11)
-
-    //update
     user.age++
-    expect(nextAge).toBe(12)
+    //update
+
+    // expect(nextAge).toBe(12)
+    // expect(newName).toBe('zhangsan2')
 
   })
 })
