@@ -4,7 +4,6 @@ export  function reactive (raw) {
     return new Proxy (raw, {
         get(traget, key){
             const res = Reflect.get(traget, key)
-            console.log(traget, '====', key)
             track(traget, key)
             return res
         },
