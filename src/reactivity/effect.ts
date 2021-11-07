@@ -16,7 +16,7 @@ class ReactiveEffect
         return this._fn()
     }
     stop() {
-        // 执行 stop ，把 deps 收集的 effect 全部删除， 就无法进行更新，在 运行runner 的时候 ，重新收集 effect
+        // 执行 stop ，把 deps 收集的 effect 全部删除， 就无法进行更新，在 运行runner 的时候 ，会执行返回的 _fn 
         // cleanupEffect
         if(this.active){
             cleanupEffect(this)
