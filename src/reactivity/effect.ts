@@ -18,7 +18,7 @@ class ReactiveEffect
 // targetMap 用于储存依赖
 const targetMap = new Map()
 export function track (target, key) {
-    // 依赖收集 && 触发依赖 函数 用于 后面响应数据，更新数据
+    // 依赖收集 函数 用于 后面响应数据，更新数据
     // 先取出 全部的 target，
     // target -> key -> dep
     let depsMap = targetMap.get(target)
@@ -35,6 +35,7 @@ export function track (target, key) {
         depsMap.set(key, dep)
     }
     dep.add(activeEffect)
+    console.log('track', targetMap)
     // const dep = new Set()
 }
 // update 触发。
