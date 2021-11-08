@@ -1,10 +1,16 @@
 import { track, trigger } from "./effect"
+import { ReactiveFlags } from "./reactive"
 // 缓存机制，初始化的时候就创建了。后面一直使用
 const get = createGetter()
 const set = createSetter()
 const readonlyGet = createGetter(true)
 function createGetter(isReadonly = false) {
   return function get(traget, key) {
+    if(key === ReactiveFlags.IS_REACTIVE){
+      return !isReadonly
+    }else if(key === ReactiveFlags.IS_READONLY){
+      return isReadonly
+    }
     const res = Reflect.get(traget, key)
     if(!isReadonly){
       track(traget, key)
