@@ -1,6 +1,8 @@
 // 依赖收集
 // 创建一个 effect ->
 import { extend } from '../shared'
+let activeEffect;
+let shouldTrack;
 // 使用类 构造 对应的依赖对象
 class ReactiveEffect
 {
@@ -10,10 +12,20 @@ class ReactiveEffect
     onStop?: () => void
     constructor(fn, public scheduler?){
         this._fn = fn
+        this.scheduler = scheduler
     }
     run() {
+        // 会收集依赖
+        if(!this.active){
+            return this._fn()
+        }
+        shouldTrack = true
+        // 如果不是 stop 的状态，需要收集依赖
         activeEffect = this
-        return this._fn()
+        const result = this._fn()
+        // reset
+        shouldTrack = false
+        return result
     }
     stop() {
         // 执行 stop ，把 deps 收集的 effect 全部删除， 就无法进行更新，在 运行runner 的时候 ，会执行返回的 _fn
@@ -31,11 +43,14 @@ function cleanupEffect (effect) {
     effect.deps.forEach((dep:any) => {
         dep.delete(effect)
     });
+    effect.deps.length = 0;
+    
 }
 // Map 结构  [ { key:'', value: '' } ]  key 的设定可以多样性。相对 Obj 有更多的拓展，例如 key : funciton()
 // targetMap 用于储存依赖
 const targetMap = new Map()
 export function track (target, key) {
+    if(!isTracking()) return
     // 依赖收集 函数 用于 后面响应数据，更新数据
     // 先取出 全部的 target，
     // target -> key -> dep
@@ -52,11 +67,17 @@ export function track (target, key) {
         dep = new Set()
         depsMap.set(key, dep)
     }
-    if(!activeEffect) return
+    // 防止重复收集依赖， 解决了第一节的 问题、
+    if(dep.has(activeEffect)) return
     dep.add(activeEffect)
     activeEffect.deps.push(dep)
     // const dep = new Set()
 }
+function isTracking () {
+    return shouldTrack && activeEffect !== undefined;
+}
+
+
 // update 触发。
 export function trigger (target, key){
     let depsMap = targetMap.get(target)
@@ -70,7 +91,6 @@ export function trigger (target, key){
     }
 }
 
-let activeEffect;
 // 依赖收集
 export function effect (fn, options:any = {}) {
     // fn
