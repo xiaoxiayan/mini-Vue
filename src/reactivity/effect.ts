@@ -44,7 +44,7 @@ function cleanupEffect (effect) {
         dep.delete(effect)
     });
     effect.deps.length = 0;
-    
+
 }
 // Map 结构  [ { key:'', value: '' } ]  key 的设定可以多样性。相对 Obj 有更多的拓展，例如 key : funciton()
 // targetMap 用于储存依赖
@@ -67,7 +67,7 @@ export function track (target, key) {
         dep = new Set()
         depsMap.set(key, dep)
     }
-    // 防止重复收集依赖， 解决了第一节的 问题、
+    // 防止重复收集依赖， 解决了第一节的 问题、- - - - -
     if(dep.has(activeEffect)) return
     dep.add(activeEffect)
     activeEffect.deps.push(dep)
