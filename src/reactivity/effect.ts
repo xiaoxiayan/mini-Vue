@@ -67,21 +67,30 @@ export function track (target, key) {
         dep = new Set()
         depsMap.set(key, dep)
     }
+    trackEffect(dep)
+    // const dep = new Set()
+}
+
+export function trackEffect(dep) {
     // 防止重复收集依赖， 解决了第一节的 问题、- - - - -
     if(dep.has(activeEffect)) return
     dep.add(activeEffect)
     activeEffect.deps.push(dep)
-    // const dep = new Set()
-}
-function isTracking () {
-    return shouldTrack && activeEffect !== undefined;
 }
 
+
+export function isTracking() {
+    return shouldTrack && activeEffect !== undefined;
+}
 
 // update 触发。
 export function trigger (target, key){
     let depsMap = targetMap.get(target)
     let dep = depsMap.get(key)
+    triggerEffects(dep)
+}
+
+export function triggerEffects (dep) {
     for(const effect of dep) {
         if(effect.scheduler){
             effect.scheduler()

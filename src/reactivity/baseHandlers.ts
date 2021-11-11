@@ -1,10 +1,13 @@
+import { extend, isObject } from "../shared"
 import { track, trigger } from "./effect"
-import { ReactiveFlags } from "./reactive"
+import { reactive, ReactiveFlags, readonly } from "./reactive"
 // 缓存机制，初始化的时候就创建了。后面一直使用
 const get = createGetter()
 const set = createSetter()
 const readonlyGet = createGetter(true)
-function createGetter(isReadonly = false) {
+const shallowReadonlyGet = createGetter(true, true)
+
+function createGetter(isReadonly = false, shallow = false) {
   return function get(traget, key) {
     if(key === ReactiveFlags.IS_REACTIVE){
       return !isReadonly
@@ -12,6 +15,14 @@ function createGetter(isReadonly = false) {
       return isReadonly
     }
     const res = Reflect.get(traget, key)
+
+    if(shallow){
+      return res
+    }
+    // 看看 res 是不是 object , 嵌套 验证
+    if(isObject(res)){
+      return isReadonly? readonly(res) : reactive(res)
+    }
     if(!isReadonly){
       track(traget, key)
     }
@@ -39,3 +50,7 @@ export const readonlyHandlers = {
       return true
     }
 }
+
+export const shallowReadonlyHandler = extend({}, readonlyHandlers, {
+  get: shallowReadonlyGet,
+})
