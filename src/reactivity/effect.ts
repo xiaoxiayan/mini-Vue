@@ -110,5 +110,6 @@ export function effect (fn, options:any = {}) {
 }
 
 export function stop (runner) {
+    //  water~~~~
     runner.effect.stop()
 }
