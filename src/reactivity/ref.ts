@@ -24,7 +24,6 @@ class RefImpl {
       this._value = newValue
       triggerEffects(this.dep)
     }
-
   }
 }
 
