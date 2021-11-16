@@ -19,7 +19,7 @@ function createGetter(isReadonly = false, shallow = false) {
     if(shallow){
       return res
     }
-    // 看看 res 是不是 object , 嵌套 验证
+    // 看看 res 是不是 object , 嵌套 验证,
     if(isObject(res)){
       return isReadonly? readonly(res) : reactive(res)
     }
