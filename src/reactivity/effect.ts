@@ -4,7 +4,7 @@ import { extend } from '../shared'
 let activeEffect;
 let shouldTrack;
 // 使用类 构造 对应的依赖对象
-class ReactiveEffect
+export class ReactiveEffect
 {
     private _fn: any
     deps = []
