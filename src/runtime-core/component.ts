@@ -1,4 +1,5 @@
 export function createComponentInstance(vnode: any) {
+  //  记录一下 component 的状态信息
   const component = {
     vnode,
     type: vnode.tyoe
@@ -18,7 +19,7 @@ function setupStatefulComponet(instance: any) {
   const Component = instance.type
 
   const { setup } = Component
-
+  // v3 ，判断是否有核心的数据函数 setup
   if(setup) {
     // 可能是 fun, object
     const setupResult = setup()
@@ -29,10 +30,11 @@ function setupStatefulComponet(instance: any) {
 
 function handleSetupResult( instance, setupResult: any) {
   // fn ,obj
-  // TODO function
   if(typeof setupResult === 'object') {
     instance.setupState = setupResult
   }
+  // TODO function
+
   finishComponentSetup(instance)
 }
 
