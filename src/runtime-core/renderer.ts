@@ -19,7 +19,6 @@ function processComponent(vnode: any, container: any) {
 }
 
 function mountComponent(vnode: any, container: any) {
-
    const instance = createComponentInstance(vnode)
    setupComponent(instance)
    setupRenderEffect(instance, container)
