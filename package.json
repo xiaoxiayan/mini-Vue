@@ -1,7 +1,8 @@
 {
   "name": "mini-vue",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/ggBond-mini-vue.cjs.js",
+  "module": "lib/ggBond-mini-vue.esm.js",
   "repository": "https://github.com/xiaoxiayan/mini-Vue.git",
   "author": "v_qiwulv <v_qiwulv@tencent.com>",
   "license": "MIT",
@@ -12,8 +13,8 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
-    "@babel/preset-typescript": "^7.16.0",
-    "@rollup/plugin-typescript": "^8.3.0",
+    "@babel/preset-typescript": "^7.15.0",
+    "@rollup/plugin-typescript": "^8.2.5",
     "@types/jest": "^27.0.2",
     "babel-jest": "^27.3.1",
     "jest": "^27.3.1",
