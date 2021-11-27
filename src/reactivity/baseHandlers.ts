@@ -1,4 +1,4 @@
-import { extend, isObject } from "../shared"
+import { extend, isObject } from "../shared/index"
 import { track, trigger } from "./effect"
 import { reactive, ReactiveFlags, readonly } from "./reactive"
 // 缓存机制，初始化的时候就创建了。后面一直使用
