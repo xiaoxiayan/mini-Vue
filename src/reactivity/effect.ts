@@ -1,6 +1,6 @@
 // 依赖收集
 // 创建一个 effect ->
-import { extend } from '../shared'
+import { extend } from '../shared/index'
 let activeEffect;
 let shouldTrack;
 // 使用类 构造 对应的依赖对象
