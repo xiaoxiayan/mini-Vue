@@ -8,7 +8,10 @@ export const App = {
     // 渲染的 ui
     return h("div", {
       id: 'root',
-      class: ['red', 'hard']
+      class: ['red', 'hard'],
+      onClick() {
+        console.log('click')
+      }
     } ,
     // setupState
     // this.$el  -> 需要 root element

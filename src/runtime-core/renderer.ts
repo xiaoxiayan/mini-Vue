@@ -38,15 +38,28 @@ function mountElement(vnode: any, container: any) {
   }
  const { props } = vnode
  for (const key in props) {
-    const val = props[key]
+    console.log(key)
+    let val = props[key]
     // TODO 如果 class是个数组
     if(Array.isArray(val)) {
       let className = ''
       val.map(name => {
         className += name +' '
       })
-    el.setAttribute(key, className)
-    }else{
+      val = className
+    }
+
+    // 添加事件，
+    // rule: on 开头 ，第三位 为大写
+    // 具体的 click ---> 通用
+    // on + Event 
+    const isOn = (key: string) => /^on[A-Z]/.test(key)
+    if(isOn(key)) {
+      // 是事件，添加
+      console.log('cominig===');
+      const event = key.slice(2).toLocaleLowerCase()
+      el.addEventListener(event, val);
+    }else {
       el.setAttribute(key, val)
     }
  }
