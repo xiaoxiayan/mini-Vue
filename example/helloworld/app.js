@@ -25,7 +25,7 @@ export const App = {
 
   setup() {
     return {
-      msg: 'mini-vue-dddd'
+      msg: 'mini-vue-ddaaaaaadd'
     }
   }
 }
