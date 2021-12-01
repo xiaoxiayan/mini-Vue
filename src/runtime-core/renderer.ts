@@ -81,6 +81,7 @@ function setupRenderEffect(instance: any, initialVnode, container) {
   const subTree = instance.render.call(proxy)
   // vnode -> patch
   // vnode -> element -> mountElement
+  // water ~
   patch(subTree, container)
   initialVnode.el = subTree.el
 }
