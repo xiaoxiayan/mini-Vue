@@ -40,7 +40,6 @@ function mountElement(vnode: any, container: any) {
 
  const { props } = vnode
  for (const key in props) {
-    console.log(key)
     let val = props[key]
     // TODO 如果 class是个数组
     if(Array.isArray(val)) {
@@ -58,7 +57,6 @@ function mountElement(vnode: any, container: any) {
     const isOn = (key: string) => /^on[A-Z]/.test(key)
     if(isOn(key)) {
       // 是事件，添加
-      console.log('cominig===');
       const event = key.slice(2).toLocaleLowerCase()
       el.addEventListener(event, val);
     }else {

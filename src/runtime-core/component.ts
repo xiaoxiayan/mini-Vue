@@ -1,3 +1,5 @@
+import { shallowReadonly } from "../reactivity/reactive"
+import { initProps } from "./componentProps"
 import { componentPublicInstance } from "./componentPublicInstance"
 
 export function createComponentInstance(vnode: any) {
@@ -7,12 +9,13 @@ export function createComponentInstance(vnode: any) {
     type: vnode.type,
     setupState: {},
     el: null,
+    props: {}
   }
   return component
 }
 export function setupComponent(instance: any) {
   // TODO
-  // initProps()
+  initProps(instance, instance.vnode.props)
   // TODO
   // initSlots()
   // 初始化一个有状态的 component
@@ -32,7 +35,7 @@ function setupStatefulComponet(instance: any) {
   // v3 ，判断是否有核心的数据函数 setup
   if(setup) {
     // 可能是 fun, object
-    const setupResult = setup()
+    const setupResult = setup(shallowReadonly(instance.props))
     handleSetupResult(instance, setupResult)
 
   }
