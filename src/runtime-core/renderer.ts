@@ -52,7 +52,7 @@ function mountElement(vnode: any, container: any) {
 
     // 添加事件，
     // rule: on 开头 ，第三位 为大写
-    // 具体的 click ---> 通用 9 -- -------
+    // 具体的 click ---> 通用 9 -- -------------
     // on + Event
     const isOn = (key: string) => /^on[A-Z]/.test(key)
     if(isOn(key)) {
