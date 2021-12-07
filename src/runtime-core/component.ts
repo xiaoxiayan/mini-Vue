@@ -1,4 +1,5 @@
 import { shallowReadonly } from "../reactivity/reactive"
+import { emit } from "./componentEmit";
 import { initProps } from "./componentProps"
 import { componentPublicInstance } from "./componentPublicInstance"
 
@@ -9,8 +10,10 @@ export function createComponentInstance(vnode: any) {
     type: vnode.type,
     setupState: {},
     el: null,
-    props: {}
+    props: {},
+    emit: () => {}
   }
+  component.emit = emit.bind(null, component) as any;
   return component
 }
 export function setupComponent(instance: any) {
@@ -29,13 +32,15 @@ function setupStatefulComponet(instance: any) {
   // 设置一个代理对象，绑定到render上 ，让render的时候可以获取到变量,所有在 render中的 get操作都会被代理。
   // 从而通过代理 拿到值
   instance.proxy = new Proxy(
-    {_: instance}, 
+    {_: instance},
     componentPublicInstance
    )
   // v3 ，判断是否有核心的数据函数 setup
   if(setup) {
     // 可能是 fun, object
-    const setupResult = setup(shallowReadonly(instance.props))
+    const setupResult = setup(shallowReadonly(instance.props), {
+      emit: instance.emit,
+    })
     handleSetupResult(instance, setupResult)
 
   }

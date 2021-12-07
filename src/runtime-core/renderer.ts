@@ -49,7 +49,6 @@ function mountElement(vnode: any, container: any) {
       })
       val = className
     }
-
     // 添加事件，
     // rule: on 开头 ，第三位 为大写
     // 具体的 click ---> 通用 9 -- -------------
