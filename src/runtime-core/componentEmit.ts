@@ -1,10 +1,15 @@
-export function emit (instance, event) {
-  console.log('componentEmit' ,event)
+import { camelize, toHandlerKey } from "../shared/index"
+
+export function emit (instance, event, ...args) {
   // insatnce.props --> event
   const { props } = instance
 
 // TPP
 // 先去写一个特定的行为---》 重构成通用的行为
-const handler = props["onAdd"]
-handler && handler()
+// add -> Add
+// add-foo -> addFoo
+
+const handlerName  = toHandlerKey(camelize(event))
+const handler = props[handlerName]
+handler && handler(...args)
 }

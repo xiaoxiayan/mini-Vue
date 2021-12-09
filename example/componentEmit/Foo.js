@@ -3,8 +3,9 @@ import { h } from "../../lib/ggBond-mini-vue.esm.js"
 export const Foo = {
     setup(props, { emit }) {
         const emitAdd = () => {
-          console.log('emit add')
-          emit('add')
+          console.log('emit btn')
+          emit('add', 1,2)
+          emit('add-foo', 3, 4)
         }
         return {
           emitAdd
