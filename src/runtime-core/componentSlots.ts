@@ -1,11 +1,17 @@
+import { ShapeFlags } from "../shared/shapeFlags"
+
 export function initSlots (instance, children) {
-    normalizeObjectSlots(instance, children.slots)
+    // 判断是不是 slot 类型才进行初始化
+    const { vnode } = instance
+    if(vnode.shapeFlag && ShapeFlags.SLOT_CHILDREN) {
+        normalizeObjectSlots(instance.slots, children)
+    }
 }
 function normalizeObjectSlots(slots: any, children: any) {
-    for (const key in slots) {
-        const value = slots[key]
+    for (const key in children) {
+        const value = children[key]
         // slot
-        slots[key] = normalizeSlotValue(value)
+        slots[key] = (props) => normalizeSlotValue(value(props))
     }
 }
 

@@ -11,8 +11,8 @@ export const App = {
             Foo, 
             {},
             {
-                header: h('p', {}, 'header'),
-                footer: h('p', {}, 'footer')
+                header: ( { age } ) => h('p', {}, 'header' + age),
+                footer: ( { age } ) => h('p', {}, 'footer'+ age )
             } 
             )
         

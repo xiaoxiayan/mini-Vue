@@ -13,6 +13,13 @@ export function createVNode(type, props?, children?) {
   } else if (Array.isArray(children)) {
     vnode.shapeFlag |= ShapeFlags.ARRAY_CHILDREN
   }
+  // 判断是否为 slot类型， 组件 + children Object
+  if(vnode.shapeFlag && ShapeFlags.STATEFUL_COMPONENT) {
+    if(typeof children === 'object') {
+      vnode.shapeFlag !== ShapeFlags.SLOT_CHILDREN
+    }
+  }
+
   return vnode
 }
 
