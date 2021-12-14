@@ -13,8 +13,6 @@ export const componentPublicInstance = {
         if(key in setupState) {
           return  setupState[key]
         }
-
-
         if(hasOwn(setupState, key)) {
           return setupState[key]
         } else if (hasOwn(props, key)) {

@@ -1,6 +1,7 @@
 import { isObject } from "../shared/index"
 import { ShapeFlags } from "../shared/shapeFlags"
 import { createComponentInstance, setupComponent } from "./component"
+import { Fragment, Text } from "./vnode"
 
 export function render(vnode, container) {
   // 调用 patch， 方便后续的递归
@@ -11,14 +12,26 @@ function patch(vnode: any, container: any) {
   // 处理组件
   // 判断类型 类型主要分为两种，一种是 component 类型
   // render { component } vue文件都是组件类型
-  const { shapeFlag } = vnode
-  if(shapeFlag & ShapeFlags.ELEMENT) {
-  //  另一种是 element 类型。 render { div } 直接调用render去渲染dom
-  // TODO processElement
-    processElement(vnode, container)
-  } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-    processComponent(vnode, container)
+  const { type, shapeFlag } = vnode
+  // Fragment -> 只渲染 chilren
+  switch (type) {
+    case Fragment:
+      processFragment(vnode, container)
+      break;
+    case Text:
+      processText(vnode, container)
+      break;
+    default:
+      if(shapeFlag & ShapeFlags.ELEMENT) {
+        //  另一种是 element 类型。 render { div } 直接调用render去渲染dom
+        // TODO processElement
+          processElement(vnode, container)
+        } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+          processComponent(vnode, container)
+        }
+      break;
   }
+
 
 }
 function processElement(vnode, container) {
@@ -87,5 +100,16 @@ function mountChildren(vnode: any, container: any) {
   vnode.children.forEach((v) => {
     patch(v, container)
   })
+}
+
+function processFragment(vnode: any, container: any) {
+  // implement
+  mountChildren(vnode, container)
+}
+
+export function processText(vnode: any, container: any) {
+  const { children } = vnode
+  const textNode = (vnode.el = document.createTextNode(children))
+  container.append(textNode)
 }
 
