@@ -39,6 +39,8 @@ function setupStatefulComponet(instance: any) {
    )
   // v3 ，判断是否有核心的数据函数 setup
   if(setup) {
+    // 在 setup 的时候 给 currentInstance 赋值
+    setCurrentInstance(instance)
     // 可能是 fun, object
     const setupResult = setup(shallowReadonly(instance.props), {
       emit: instance.emit,
@@ -62,4 +64,12 @@ function finishComponentSetup(instance) {
   const Component = instance.type
   instance.render = Component.render
 }
-
+//  定义一个全局变量  currentInstance  去获取当前的 实例对象 type。
+let currentInstance = null
+export function getCurrentInstance () {
+  return currentInstance
+}
+// 使用函数包裹，可以方便后续 debugger
+function setCurrentInstance (instance) {
+  currentInstance = instance
+}
