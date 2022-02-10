@@ -4,7 +4,7 @@ import { initProps } from "./componentProps"
 import { componentPublicInstance } from "./componentPublicInstance"
 import { initSlots } from "./componentSlots";
 
-export function createComponentInstance(vnode: any) {
+export function createComponentInstance(vnode: any, parent) {
   //  记录一下 component 的状态信息
   const component = {
     vnode,
@@ -13,6 +13,8 @@ export function createComponentInstance(vnode: any) {
     el: null,
     props: {},
     slots: {},
+    provides: parent ? parent.provides : {},
+    parent,
     emit: () => {}
   }
   component.emit = emit.bind(null, component) as any;
@@ -45,6 +47,7 @@ function setupStatefulComponet(instance: any) {
     const setupResult = setup(shallowReadonly(instance.props), {
       emit: instance.emit,
     })
+    setCurrentInstance(null);
     handleSetupResult(instance, setupResult)
 
   }

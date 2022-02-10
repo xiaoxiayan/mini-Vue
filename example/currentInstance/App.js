@@ -1,4 +1,4 @@
-import { h, getCurrentInstance } from "../../lib/ggBond-mini-vue.esm.js";
+import { h, getCurrentInstance, provide } from "../../lib/ggBond-mini-vue.esm.js";
 import { Foo } from "./Foo.js";
 
 export const App = {
@@ -9,6 +9,5 @@ export const App = {
 
   setup() {
     const instance = getCurrentInstance();
-    console.log("App:", instance);
   },
 };
