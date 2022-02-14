@@ -43,6 +43,8 @@ function processComponent(vnode: any, container: any, parentComponent) {
 }
 
 function mountElement(vnode: any, container: any, parentComponent) {
+  // canvs
+  // new Element()
   const el = (vnode.el =  document.createElement(vnode.type))
   const { children, shapeFlag } = vnode
   if(shapeFlag & ShapeFlags.TEXT_CHILDREN){
