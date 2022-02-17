@@ -1,9 +1,13 @@
-import { isObject } from "../shared/index"
 import { ShapeFlags } from "../shared/shapeFlags"
 import { createComponentInstance, setupComponent } from "./component"
+import { createAppAPI } from "./createApp"
 import { Fragment, Text } from "./vnode"
 
-export function render(vnode, container) {
+
+export function createRenderer (options) {
+
+ const { createElement, pathProp, insert  } = options
+ function render(vnode, container) {
   // 调用 patch， 方便后续的递归
   patch(vnode, container, null)
 }
@@ -45,14 +49,15 @@ function processComponent(vnode: any, container: any, parentComponent) {
 function mountElement(vnode: any, container: any, parentComponent) {
   // canvs
   // new Element()
-  const el = (vnode.el =  document.createElement(vnode.type))
+  // 挂在不同的平台，canvas ,dom
+
+  const el = (vnode.el = createElement(vnode.type))
   const { children, shapeFlag } = vnode
   if(shapeFlag & ShapeFlags.TEXT_CHILDREN){
     el.textContent = children
   } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
     mountChildren(vnode, el, parentComponent)
   }
-
  const { props } = vnode
  for (const key in props) {
     let val = props[key]
@@ -64,22 +69,11 @@ function mountElement(vnode: any, container: any, parentComponent) {
       })
       val = className
     }
-    // 添加事件，
-    // rule: on 开头 ，第三位 为大写
-    // 具体的 click ---> 通用 9 -- -------------
-    // on + Event
-    const isOn = (key: string) => /^on[A-Z]/.test(key)
-    if(isOn(key)) {
-      // 是事件，添加
-      const event = key.slice(2).toLocaleLowerCase()
-      el.addEventListener(event, val);
-    }else {
-      el.setAttribute(key, val)
-    }
+    pathProp(el, key, val)
  }
- container.append(el)
-}
 
+ insert(el, container)
+}
 
 
 function mountComponent(initialVnode: any, container: any, parentComponent) {
@@ -109,9 +103,15 @@ function processFragment(vnode: any, container: any, parentComponent) {
   mountChildren(vnode, container, parentComponent)
 }
 
-export function processText(vnode: any, container: any) {
+ function processText(vnode: any, container: any) {
   const { children } = vnode
   const textNode = (vnode.el = document.createTextNode(children))
   container.append(textNode)
 }
+// 返回一个对象，把 render funciton 传过去
+//
+return {
+    createApp: createAppAPI(render)
+  }
 
+}
