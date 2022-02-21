@@ -1,0 +1,15 @@
+// 将键绑定放在此文件中以覆盖默认值auto[]
+[
+    {
+        "key": "ctrl+n",
+        "command": "explorer.newFile",
+    },
+   {
+       "key": "ctrl+m",
+       "command": "explorer.newFolder"
+},
+{
+    "key": "ctrl+alt+r",
+    "command": "fileutils.renameFile"
+}
+]

@@ -1,3 +1,4 @@
+import { effect } from "../reactivity/effect"
 import { ShapeFlags } from "../shared/shapeFlags"
 import { createComponentInstance, setupComponent } from "./component"
 import { createAppAPI } from "./createApp"
@@ -81,15 +82,19 @@ function mountComponent(initialVnode: any, container: any, parentComponent) {
    setupComponent(instance)
    setupRenderEffect(instance, initialVnode, container)
 }
-
+// 更新 effect
 function setupRenderEffect(instance: any, initialVnode, container) {
-  const { proxy } = instance
-  const subTree = instance.render.call(proxy)
-  // vnode -> patch
-  // vnode -> element -> mountElement
-  // water ~
-  patch(subTree, container, instance)
-  initialVnode.el = subTree.el
+  // 使用 effect去包裹，在effect中传入函数
+  // effect(() => {
+    const { proxy } = instance
+    const subTree = instance.render.call(proxy)
+    // vnode -> patch
+    // vnode -> element -> mountElement
+    // 我们在每次更新的时候都回去创建一个新的，所以需要进新对比
+    // 可以定义一个 isMount ,判断isMount ,如果是就初始化，赋值， 否则就对比
+    patch(subTree, container, instance)
+    initialVnode.el = subTree.el
+  // })
 }
 
 function mountChildren(vnode: any, container: any, parentComponent) {

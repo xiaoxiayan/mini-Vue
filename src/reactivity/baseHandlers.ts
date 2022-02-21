@@ -15,7 +15,6 @@ function createGetter(isReadonly = false, shallow = false) {
       return isReadonly
     }
     const res = Reflect.get(traget, key)
-
     if(shallow){
       return res
     }
@@ -33,6 +32,7 @@ function createGetter(isReadonly = false, shallow = false) {
 function createSetter() {
   return function set(traget, key, value) {
     const res = Reflect.set(traget, key, value)
+    // 触发设置
     trigger(traget, key)
     return res
   }

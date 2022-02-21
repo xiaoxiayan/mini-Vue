@@ -1,3 +1,4 @@
+import { proxyRefs } from "../reactivity";
 import { shallowReadonly } from "../reactivity/reactive"
 import { emit } from "./componentEmit";
 import { initProps } from "./componentProps"
@@ -15,6 +16,7 @@ export function createComponentInstance(vnode: any, parent) {
     slots: {},
     provides: parent ? parent.provides : {},
     parent,
+    isMount: false, 
     emit: () => {}
   }
   component.emit = emit.bind(null, component) as any;
@@ -32,7 +34,6 @@ export function setupComponent(instance: any) {
 function setupStatefulComponet(instance: any) {
   const Component = instance.type
   const { setup } = Component
-
   // 设置一个代理对象，绑定到render上 ，让render的时候可以获取到变量,所有在 render中的 get操作都会被代理。
   // 从而通过代理 拿到值
   instance.proxy = new Proxy(
@@ -56,10 +57,10 @@ function setupStatefulComponet(instance: any) {
 function handleSetupResult( instance, setupResult: any) {
   // fn ,obj
   if(typeof setupResult === 'object') {
-    instance.setupState = setupResult
+    //   包裹一下，使得ref 在使用的时候， 直接获取到 proxyRefs
+    instance.setupState = proxyRefs(setupResult) 
   }
   // TODO function
-
   finishComponentSetup(instance)
 }
 
