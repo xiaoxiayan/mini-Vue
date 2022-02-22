@@ -42,8 +42,6 @@ export function ref(value) {
 }
 
 function trackRefValue(ref) {
-  console.log(ref, '---', isTracking())
-
   if(isTracking()){
     trackEffect(ref.dep)
   }

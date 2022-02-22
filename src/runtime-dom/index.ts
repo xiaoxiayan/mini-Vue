@@ -4,7 +4,7 @@ function createElement(type) {
   return document.createElement(type)
 }
 
-function patchProp(el, key, val) {
+function patchProp(el, key, prevVal, nextVal) {
     // 添加事件，修改属性
     // rule: on 开头 ，第三位 为大写
     // 具体的 click ---> 通用 9 -- -------------
@@ -13,9 +13,14 @@ function patchProp(el, key, val) {
     if(isOn(key)) {
       // 是事件，添加
       const event = key.slice(2).toLocaleLowerCase()
-      el.addEventListener(event, val);
+      el.addEventListener(event, nextVal);
     }else {
-      el.setAttribute(key, val)
+     // 如果 nextVal 变成 underfined 需要把属性删除
+      if(nextVal === undefined || nextVal === null) {
+        el.removeAttribute(key)
+      } else {
+        el.setAttribute(key, nextVal)
+      }
     }
 }
 

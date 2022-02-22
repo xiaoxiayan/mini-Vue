@@ -75,7 +75,7 @@ function mountElement(vnode: any, container: any, parentComponent) {
       })
       val = className
     }
-    hostPatchProp(el, key, val)
+    hostPatchProp(el, key, null, val)
  }
 
  insert(el, container)
@@ -106,7 +106,6 @@ function setupRenderEffect(instance: any, initialVnode, container) {
       instance.isMount = true
     } else {
       // 对比两个树
-      console.log('update')
       const { proxy  } = instance
       const prevSubTree = instance.subTree
       const subTree = instance.render.call(proxy)
@@ -120,8 +119,35 @@ function setupRenderEffect(instance: any, initialVnode, container) {
 
 function patchElement (n1, n2, container) {
   // 处理更新逻辑。props , element
-  console.log('n1', n1)
-  console.log('n2', n2)
+  console.log('n1-old', n1)
+  console.log('n2-new', n2)
+  // 需要把 el 继承，方便下次更新的时候
+  const el = (n2.el = n1.el)
+  const oldProps = n1.props || {}
+  const nextProps = n2.props
+
+  patchProps(el, oldProps, nextProps)
+}
+function patchProps(el, oldProps, newProps) {
+  if(oldProps !== newProps) {
+  // 遍历属性，新的属性遍历，对比老的, 调用传值修改。
+    for (const key in newProps) {
+      const prevProps = oldProps[key]
+      const nextProps = newProps[key]
+      if(prevProps !== nextProps) {
+        hostPatchProp(el, key, prevProps, nextProps)
+      }
+    }
+    // 如果 oldProps 是一个空对象，不要去检测
+    // 如果 props 改了。需要遍历old 的props ,如果新的没有，需要删除
+    if(oldProps !== {}) {
+      for (const key in oldProps) {
+        if(!(key in newProps)) {
+          hostPatchProp(el, key, oldProps[key], null)
+        }
+      }
+    }
+  }
 }
 
 function mountChildren(vnode: any, container: any, parentComponent) {
