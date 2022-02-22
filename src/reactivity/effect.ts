@@ -110,11 +110,11 @@ export function effect (fn, options:any = {}) {
     // Object.assign(_effect, options)
     // 重构 更加 语义化 extend
     extend(_effect, options)
-
     _effect.run()
     // runner 相当于 effect 返回的 _fn ，然后再把 当前_effect 挂载在return 出去
     const runner: any = _effect.run.bind(_effect)
     runner.effect = _effect
+    
     return runner
 }
 

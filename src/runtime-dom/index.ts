@@ -4,9 +4,8 @@ function createElement(type) {
   return document.createElement(type)
 }
 
-function pathProp(el, key, val) {
-
-  // 添加事件，
+function patchProp(el, key, val) {
+    // 添加事件，修改属性
     // rule: on 开头 ，第三位 为大写
     // 具体的 click ---> 通用 9 -- -------------
     // on + Event
@@ -25,7 +24,7 @@ function insert(el, parent) {
 }
 const renderer: any = createRenderer({
   createElement,
-  pathProp,
+  patchProp,
   insert
 })
 

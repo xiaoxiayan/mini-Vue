@@ -38,10 +38,12 @@ function convert(value) {
 }
 
 export function ref(value) {
-  return new RefImpl(value)
+  return  new RefImpl(value)
 }
 
 function trackRefValue(ref) {
+  console.log(ref, '---', isTracking())
+
   if(isTracking()){
     trackEffect(ref.dep)
   }
@@ -56,7 +58,7 @@ export function unRef(ref) {
 }
 
 export function proxyRefs(objectWithRefs) {
-  // get ->  判断是不是 ref ，然后返回 value
+  // get -> 判断是不是 ref ，然后返回 value
   // get -> 不是 ref . return ref
   //  Proxy 方法拦截 target 对象的属性赋值行为。它采用 Reflect.set 方法将值赋值给对象的属性，确保完成原有的行为，然后再部署额外的功能。
   return new Proxy(objectWithRefs, {
@@ -72,7 +74,5 @@ export function proxyRefs(objectWithRefs) {
         return Reflect.set(target, key, value)
       }
     }
-
-
   })
 }
