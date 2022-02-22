@@ -38,7 +38,7 @@ function convert(value) {
 }
 
 export function ref(value) {
-  return   new RefImpl(value)
+  return new RefImpl(value)
 }
 
 function trackRefValue(ref) {
