@@ -27,10 +27,25 @@ function patchProp(el, key, prevVal, nextVal) {
 function insert(el, parent) {
   parent.append(el)
 }
+function remove(child) {
+  const parent = child.parentNode
+  if(parent) {
+    parent.removeChild(child)
+  }
+}
+
+function setElementText (el, text) {
+  el.textContent = text
+}
+
+
+
 const renderer: any = createRenderer({
   createElement,
   patchProp,
-  insert
+  insert,
+  remove,
+  setElementText
 })
 
 // 输出一个 createApp， 维持原有的调用

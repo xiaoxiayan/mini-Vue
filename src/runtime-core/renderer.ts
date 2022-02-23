@@ -8,8 +8,11 @@ import { Fragment, Text } from "./vnode"
 export function createRenderer (options) {
  const {
    createElement,
-   patchProp:hostPatchProp,
-   insert
+   patchProp: hostPatchProp,
+   insert,
+   remove: hostRemove,
+   setElementText: hostSetElementText
+
   } = options
  function render(vnode, container) {
   // 调用 patch， 方便后续的递归
@@ -46,7 +49,7 @@ function processElement(n1, n2, container, parentComponent) {
   if(!n1) {
     mountElement(n2, container, parentComponent)
   } else {
-    patchElement(n1, n2, container)
+    patchElement(n1, n2, container, parentComponent)
   }
 }
 function processComponent(n1, n2: any, container: any, parentComponent) {
@@ -62,7 +65,7 @@ function mountElement(vnode: any, container: any, parentComponent) {
   if(shapeFlag & ShapeFlags.TEXT_CHILDREN){
     el.textContent = children
   } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-    mountChildren(vnode, el, parentComponent)
+    mountChildren(vnode.children, el, parentComponent)
   }
  const { props } = vnode
  for (const key in props) {
@@ -91,13 +94,11 @@ function mountComponent(initialVnode: any, container: any, parentComponent) {
 function setupRenderEffect(instance: any, initialVnode, container) {
   // 使用 effect去包裹，在effect中传入函数
   effect(() => {
-
     // vnode -> patch
     // vnode -> element -> mountElement
     // 我们在每次更新的时候都回去创建一个新的，所以需要进新对比
     // 可以定义一个 isMount ,判断isMount ,如果是就初始化，赋值， 否则就对比
     if(!instance.isMount) {
-      console.log('init')
       // 初始化
       const { proxy  } = instance
       const subTree = (instance.subTree =  instance.render.call(proxy))
@@ -110,14 +111,13 @@ function setupRenderEffect(instance: any, initialVnode, container) {
       const prevSubTree = instance.subTree
       const subTree = instance.render.call(proxy)
       instance.subTree = subTree
-
       patch(prevSubTree, subTree, container, instance)
       // if(subTree !== prevSubTree)
     }
   })
 }
 
-function patchElement (n1, n2, container) {
+function patchElement (n1, n2, container, parentComponent) {
   // 处理更新逻辑。props , element
   console.log('n1-old', n1)
   console.log('n2-new', n2)
@@ -125,8 +125,54 @@ function patchElement (n1, n2, container) {
   const el = (n2.el = n1.el)
   const oldProps = n1.props || {}
   const nextProps = n2.props
-
+  // 更新子集，更新props
+  patchChildren(n1, n2, el, parentComponent)
   patchProps(el, oldProps, nextProps)
+}
+function patchChildren (n1, n2, container, parentComponent) {
+  // 判断子集的内容，
+  const { shapeFlag } = n2
+  const prevShapeFlag = n1.shapeFlag
+  const c1 = n1.children
+  const c2 = n2.children
+  // 如果新的 shapeFlag 是 text
+  if(shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+    // 如果旧的是 array
+     if(prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        // 1.把老的数组清空
+        unmountChildren(n1.children)
+        // 2.set -> text 加载
+     }
+     // 两个节点都是 text
+     // 1.把原来的 text 置空，然后替换成新的text
+     //  重构， 对于数组转 TEXT ，C1 和 C2 本来就不一样， 文本也可以直接对比
+    if(c1 !== c2) {
+      hostSetElementText(container, c2)
+    }
+  } else {
+    // 如果新的是数组
+    //  text -> Array || Array -> Array
+    if(prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      // 旧的是text
+      // 1.先把text = ''
+      hostSetElementText(container, '')
+      // 2.pathArray
+    } else {
+      // 旧的是数组
+      // 1.先romve ，在 mount
+      unmountChildren(n1.children)
+    }
+    // mountChildren(c2, container, n2)
+    mountChildren(c2, container, parentComponent)
+  }
+
+}
+function unmountChildren(children) {
+  // 循环调用runtime-dom 中的 remove
+  for (let index = 0; index < children.length; index++) {
+    const element = children[index].el;
+    hostRemove(element)
+  }
 }
 function patchProps(el, oldProps, newProps) {
   if(oldProps !== newProps) {
@@ -150,15 +196,15 @@ function patchProps(el, oldProps, newProps) {
   }
 }
 
-function mountChildren(vnode: any, container: any, parentComponent) {
-  vnode.children.forEach((v) => {
+function mountChildren(children: any, container: any, parentComponent) {
+  children.forEach((v) => {
     patch( null, v, container, parentComponent)
   })
 }
 
 function processFragment(n1, n2: any, container: any, parentComponent) {
   // implement
-  mountChildren(n2, container, parentComponent)
+  mountChildren(n2.children, container, parentComponent)
 }
 
  function processText(n1, n2: any, container: any) {
