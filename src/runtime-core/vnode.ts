@@ -1,5 +1,5 @@
 import { ShapeFlags } from "../shared/shapeFlags"
-export const Fragment = Symbol('Fragment')
+export const Fragment = Symbol('Fragment')  // slot 的类型
 export const Text = Symbol('Text')
 
 export function createVNode(type, props?, children?) {
@@ -10,6 +10,7 @@ export function createVNode(type, props?, children?) {
     shapeFlag: getShapFlag(type),
     children
   }
+  debugger
   if (typeof children === 'string') {
     vnode.shapeFlag |= ShapeFlags.TEXT_CHILDREN
   } else if (Array.isArray(children)) {
@@ -21,6 +22,7 @@ export function createVNode(type, props?, children?) {
       vnode.shapeFlag !== ShapeFlags.SLOT_CHILDREN
     }
   }
+  console.log('vnode->', vnode)
 
   return vnode
 }

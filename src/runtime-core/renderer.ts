@@ -37,6 +37,7 @@ function patch(n1, n2: any, container: any, parentComponent) {
         //  另一种是 element 类型。 render { div } 直接调用render去渲染dom
           processElement(n1, n2, container, parentComponent)
         } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+          console.log('Component-type--->' , type, container, parentComponent)
           processComponent(n1, n2, container, parentComponent)
         }
       break;
@@ -86,6 +87,7 @@ function mountElement(vnode: any, container: any, parentComponent) {
 
 
 function mountComponent(initialVnode: any, container: any, parentComponent) {
+  // 创建组件实例 app其实就是最大组件。
    const instance = createComponentInstance(initialVnode, parentComponent)
    setupComponent(instance)
    setupRenderEffect(instance, initialVnode, container)
@@ -204,6 +206,7 @@ function mountChildren(children: any, container: any, parentComponent) {
 
 function processFragment(n1, n2: any, container: any, parentComponent) {
   // implement
+  console.log('processFragment')
   mountChildren(n2.children, container, parentComponent)
 }
 

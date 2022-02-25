@@ -16,7 +16,7 @@ export function createComponentInstance(vnode: any, parent) {
     slots: {},
     provides: parent ? parent.provides : {},
     parent,
-    isMount: false, 
+    isMount: false,
     emit: () => {}
   }
   component.emit = emit.bind(null, component) as any;
@@ -58,7 +58,7 @@ function handleSetupResult( instance, setupResult: any) {
   // fn ,obj
   if(typeof setupResult === 'object') {
     //   包裹一下，使得ref 在使用的时候， 直接获取到 proxyRefs
-    instance.setupState = proxyRefs(setupResult) 
+    instance.setupState = proxyRefs(setupResult)
   }
   // TODO function
   finishComponentSetup(instance)
