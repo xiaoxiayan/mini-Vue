@@ -206,7 +206,6 @@ function mountChildren(children: any, container: any, parentComponent) {
 
 function processFragment(n1, n2: any, container: any, parentComponent) {
   // implement
-  console.log('processFragment')
   mountChildren(n2.children, container, parentComponent)
 }
 
