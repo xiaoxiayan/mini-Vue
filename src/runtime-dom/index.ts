@@ -24,8 +24,10 @@ function patchProp(el, key, prevVal, nextVal) {
     }
 }
 
-function insert(el, parent) {
-  parent.append(el)
+function insert(child, parent,anchor ) {
+  // parent.append(el)
+  // 使用锚点添加到对应的位置
+   parent.insertBefore(child, anchor || null)
 }
 function remove(child) {
   const parent = child.parentNode

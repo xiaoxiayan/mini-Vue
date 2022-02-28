@@ -9,17 +9,18 @@ export function createRenderer (options) {
  const {
    createElement,
    patchProp: hostPatchProp,
-   insert,
+   insert: hostInsert,
    remove: hostRemove,
    setElementText: hostSetElementText
 
   } = options
  function render(vnode, container) {
+  // 初始化
   // 调用 patch， 方便后续的递归
-  patch(null, vnode, container, null)
+  patch(null, vnode, container, null, null)
 }
 
-function patch(n1, n2: any, container: any, parentComponent) {
+function patch(n1, n2: any, container: any, parentComponent, anchor) {
   // 处理组件
   // 判断类型 类型主要分为两种，一种是 component 类型
   // render { component } vue文件都是组件类型
@@ -27,7 +28,7 @@ function patch(n1, n2: any, container: any, parentComponent) {
   // Fragment -> 只渲染 chilren
   switch (type) {
     case Fragment:
-      processFragment(n1, n2, container, parentComponent)
+      processFragment(n1, n2, container, parentComponent, anchor)
       break;
     case Text:
       processText(n1, n2, container)
@@ -35,29 +36,28 @@ function patch(n1, n2: any, container: any, parentComponent) {
     default:
       if(shapeFlag & ShapeFlags.ELEMENT) {
         //  另一种是 element 类型。 render { div } 直接调用render去渲染dom
-          processElement(n1, n2, container, parentComponent)
+          processElement(n1, n2, container, parentComponent, anchor)
         } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-          console.log('Component-type--->' , type, container, parentComponent)
-          processComponent(n1, n2, container, parentComponent)
+          processComponent(n1, n2, container, parentComponent, anchor)
         }
       break;
   }
 
 
 }
-function processElement(n1, n2, container, parentComponent) {
+function processElement(n1, n2, container, parentComponent, anchor) {
   // 分为初始化和 更新
   if(!n1) {
-    mountElement(n2, container, parentComponent)
+    mountElement(n2, container, parentComponent, anchor)
   } else {
-    patchElement(n1, n2, container, parentComponent)
+    patchElement(n1, n2, container, parentComponent, anchor)
   }
 }
-function processComponent(n1, n2: any, container: any, parentComponent) {
-  mountComponent(n2, container, parentComponent)
+function processComponent(n1, n2: any, container: any, parentComponent, anchor) {
+  mountComponent(n2, container, parentComponent, anchor)
 }
 
-function mountElement(vnode: any, container: any, parentComponent) {
+function mountElement(vnode: any, container: any, parentComponent, anchor) {
   // canvs
   // new Element()
   // 挂在不同的平台，canvas ,dom
@@ -66,7 +66,7 @@ function mountElement(vnode: any, container: any, parentComponent) {
   if(shapeFlag & ShapeFlags.TEXT_CHILDREN){
     el.textContent = children
   } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-    mountChildren(vnode.children, el, parentComponent)
+    mountChildren(vnode.children, el, parentComponent, anchor)
   }
  const { props } = vnode
  for (const key in props) {
@@ -82,18 +82,18 @@ function mountElement(vnode: any, container: any, parentComponent) {
     hostPatchProp(el, key, null, val)
  }
 
- insert(el, container)
+ hostInsert(el, container, anchor)
 }
 
 
-function mountComponent(initialVnode: any, container: any, parentComponent) {
+function mountComponent(initialVnode: any, container: any, parentComponent, anchor) {
   // 创建组件实例 app其实就是最大组件。
    const instance = createComponentInstance(initialVnode, parentComponent)
    setupComponent(instance)
-   setupRenderEffect(instance, initialVnode, container)
+   setupRenderEffect(instance, initialVnode, container, anchor)
 }
 // 更新 effect
-function setupRenderEffect(instance: any, initialVnode, container) {
+function setupRenderEffect(instance: any, initialVnode, container, anchor) {
   // 使用 effect去包裹，在effect中传入函数
   effect(() => {
     // vnode -> patch
@@ -104,7 +104,7 @@ function setupRenderEffect(instance: any, initialVnode, container) {
       // 初始化
       const { proxy  } = instance
       const subTree = (instance.subTree =  instance.render.call(proxy))
-      patch(null, subTree, container, instance)
+      patch(null, subTree, container, instance, anchor)
       initialVnode.el = subTree.el
       instance.isMount = true
     } else {
@@ -113,13 +113,13 @@ function setupRenderEffect(instance: any, initialVnode, container) {
       const prevSubTree = instance.subTree
       const subTree = instance.render.call(proxy)
       instance.subTree = subTree
-      patch(prevSubTree, subTree, container, instance)
+      patch(prevSubTree, subTree, container, instance, anchor)
       // if(subTree !== prevSubTree)
     }
   })
 }
 
-function patchElement (n1, n2, container, parentComponent) {
+function patchElement (n1, n2, container, parentComponent, anchor) {
   // 处理更新逻辑。props , element
   console.log('n1-old', n1)
   console.log('n2-new', n2)
@@ -128,10 +128,10 @@ function patchElement (n1, n2, container, parentComponent) {
   const oldProps = n1.props || {}
   const nextProps = n2.props
   // 更新子集，更新props
-  patchChildren(n1, n2, el, parentComponent)
+  patchChildren(n1, n2, el, parentComponent, anchor)
   patchProps(el, oldProps, nextProps)
 }
-function patchChildren (n1, n2, container, parentComponent) {
+function patchChildren (n1, n2, container, parentComponent, anchor) {
   // 判断子集的内容，
   const { shapeFlag } = n2
   const prevShapeFlag = n1.shapeFlag
@@ -158,17 +158,77 @@ function patchChildren (n1, n2, container, parentComponent) {
       // 旧的是text
       // 1.先把text = ''
       hostSetElementText(container, '')
+      mountChildren(c2, container, parentComponent, anchor)
       // 2.pathArray
     } else {
       // 旧的是数组
-      // 1.先romve ，在 mount
-      unmountChildren(n1.children)
+      // 1.先romve ，在 mount . 简单是实现，性能损耗很大
+      // unmountChildren(n1.children)
+      //  diff算法
+      patchKeyChildren(c1, c2, container, parentComponent, anchor)
+
     }
     // mountChildren(c2, container, n2)
-    mountChildren(c2, container, parentComponent)
   }
 
 }
+function patchKeyChildren (c1, c2, container, parentComponent, anchor) {
+    // diff
+    // 左侧对比, i++ 循环
+    let i = 0
+    const l2 = c2.length
+    let e1 = c1.length - 1
+    let e2 = l2 - 1
+    function isSomeVnodeType(n1, n2) {
+      return n1.type === n2.type && n1.key === n2.key
+    }
+    while(i <= e1  && i <= e2) {
+      const n1 = c1[i]
+      const n2 = c2[i]
+      if(isSomeVnodeType(n1, n2)){
+        // 如果相同，我们就递归去寻找d对比
+        patch(n1, n2, container, parentComponent, anchor)
+      } else {
+        break
+      }
+      console.log(i)
+      i++
+    }
+    console.log(i)
+    // 右侧对比 定位 e1 ,e2
+    while(i <= e1 && i <= e2) {
+      const n1 = c1[e1]
+      const n2 = c2[e2]
+      if(isSomeVnodeType(n1, n2)){
+        patch(n1, n2, container, parentComponent, anchor)
+      }else {
+        break
+      }
+      e1 --
+      e2 --
+    }
+
+    // 新的比老得长 ， 添加   在左侧， 在右侧
+    if(i > e1) {
+      if(i <= e2) {
+        // 添加， 标记锚点。因为在右侧的时候，一样会进来。  i=0. e1 = -1 , e2 = 0
+        // 如果 i+1 大于 c2 的长度，说明是 在左侧，添加到末尾, 否则添加到元素节点前面
+        // 当在 相同节点右侧， 左边的节点多的时候 会出bug ，e1只锁定在了 -1
+        //  获取到真正的相同元素
+        let nextPos = i + 1
+        while( c2[nextPos] && !c2[nextPos].el  && i + 1  < l2) {
+          nextPos ++
+        }
+        const anchor = nextPos  < l2 ? c2[nextPos].el : null
+        while( i <= e2) {
+          patch(null, c2[i], container, parentComponent, anchor)
+          i ++
+        }
+      }
+    }
+    // 老得比新的长， 删除   在左侧， 在右侧
+}
+
 function unmountChildren(children) {
   // 循环调用runtime-dom 中的 remove
   for (let index = 0; index < children.length; index++) {
@@ -198,15 +258,16 @@ function patchProps(el, oldProps, newProps) {
   }
 }
 
-function mountChildren(children: any, container: any, parentComponent) {
+function mountChildren(children: any, container: any, parentComponent, anchor) {
   children.forEach((v) => {
-    patch( null, v, container, parentComponent)
+    patch( null, v, container, parentComponent, anchor)
   })
 }
 
-function processFragment(n1, n2: any, container: any, parentComponent) {
+function processFragment(n1, n2: any, container: any, parentComponent, anchor) {
   // implement
-  mountChildren(n2.children, container, parentComponent)
+  console.log('processFragment')
+  mountChildren(n2.children, container, parentComponent, anchor)
 }
 
  function processText(n1, n2: any, container: any) {
