@@ -28,7 +28,7 @@ function insert(child, parent,anchor ) {
   parent.append(child)
   console.log('anchor', anchor)
   // 使用锚点添加到对应的位置
-  //  parent.insertBefore(child, anchor || null)
+   parent.insertBefore(child, anchor || null )
 }
 function remove(child) {
   const parent = child.parentNode
