@@ -215,7 +215,7 @@ function patchKeyChildren (c1, c2, container, parentComponent, anchor) {
         // 添加， 标记锚点。因为在右侧的时候，一样会进来。  i=0. e1 = -1 , e2 = 0
         // 如果 i+1 大于 c2 的长度，说明是 在左侧，添加到末尾, 否则添加到元素节点前面
         // 当在 相同节点右侧， 左边的节点多的时候 会出bug ，e1只锁定在了 -1
-        //  获取到真正的相同元素
+        //  获取到真正的相同元素 判断又问题
         let nextPos = i + 1
         // while( c2[nextPos] && !c2[nextPos].el  && i + 1  < l2) {
         //   nextPos ++
