@@ -193,7 +193,6 @@ function patchKeyChildren (c1, c2, container, parentComponent, anchor) {
       }
       i++
     }
-    console.log(i)
     // 右侧对比 定位 e1 ,e2
     while(i <= e1 && i <= e2) {
       const n1 = c1[e1]
@@ -216,11 +215,11 @@ function patchKeyChildren (c1, c2, container, parentComponent, anchor) {
         // 如果 i+1 大于 c2 的长度，说明是 在左侧，添加到末尾, 否则添加到元素节点前面
         // 当在 相同节点右侧， 左边的节点多的时候 会出bug ，e1只锁定在了 -1
         //  获取到真正的相同元素 判断又问题
-        let nextPos = i + 1
+        let nextPos = e2 + 1
         // while( c2[nextPos] && !c2[nextPos].el  && i + 1  < l2) {
         //   nextPos ++
         // }
-        const anchor = i + 1  < l2 ? c2[nextPos].el : null
+        const anchor = nextPos  < l2 ? c2[nextPos].el : null
         while( i <= e2) {
           patch(null, c2[i], container, parentComponent, anchor)
           i ++
@@ -231,6 +230,50 @@ function patchKeyChildren (c1, c2, container, parentComponent, anchor) {
       while(i <= e1) {
         hostRemove(c1[i].el)
         i++
+      }
+    } else {
+      // 中间对比。
+      // 定义 变量， map, s1 ,s2. (i的位置)
+      const keyToNewIndexMap = new Map
+      let s1 = i;
+      let s2 = i;
+      // 建立映射
+      const toBePatched =  e2 - s2  + 1
+      let patched
+      for(let i = s2; i <= e2; i++) {
+        const nextChild = c2[i]
+        keyToNewIndexMap.set(nextChild.key, i )
+      }
+      // 循环 s1节点，查找 map是否存在
+      let newIndex
+      for(let i = s1; i <= e1; i++) {
+
+        const prevChild = c1[i]
+        if(patched >= toBePatched) {
+            // 优化点，如果已经比对完了。那么旧节点中多出来的，就是多余的，可以直接去删除
+            hostRemove(prevChild.el)
+            continue
+        }
+        if(prevChild.key !== null) {
+          newIndex = keyToNewIndexMap.get(prevChild.key)
+        } else {
+          // 普通遍历
+          for(let j = s2; j <= e2; j++) {
+            if(isSomeVnodeType(prevChild, c2[j])){
+              newIndex = j
+              break;
+            }
+          }
+        }
+        if(newIndex === undefined) {
+          // 不存在删除
+          hostRemove(prevChild.el)
+        }else {
+          // 如果存在。递归去比对
+          patch(prevChild, c2[newIndex], container, parentComponent,null)
+          patched ++
+        }
+
       }
     }
 }
