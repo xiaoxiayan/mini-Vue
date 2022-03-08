@@ -1,6 +1,7 @@
 import { effect } from "../reactivity/effect"
 import { ShapeFlags } from "../shared/shapeFlags"
 import { createComponentInstance, setupComponent } from "./component"
+import { shouldUpdateComponent } from "./componentUpdateUtils"
 import { createAppAPI } from "./createApp"
 import { Fragment, Text } from "./vnode"
 
@@ -54,9 +55,25 @@ export function createRenderer(options) {
     }
   }
   function processComponent(n1, n2: any, container: any, parentComponent, anchor) {
-    mountComponent(n2, container, parentComponent, anchor)
+    if(!n1) {
+      // 初始化 component
+      mountComponent(n2, container, parentComponent, anchor)
+    } else {
+      // 更新 componet
+      updateComponent(n1, n2)
+    }
   }
 
+  function updateComponent (n1, n2) {
+    // 更新， 调用 update
+    if(shouldUpdateComponent(n1, n2)) {
+      const instance = (n2.component = n1.component)
+      instance.next = n2
+      instance.update()
+    }
+
+
+  }
   function mountElement(vnode: any, container: any, parentComponent, anchor) {
     // canvs
     // new Element()
@@ -88,14 +105,14 @@ export function createRenderer(options) {
 
   function mountComponent(initialVnode: any, container: any, parentComponent, anchor) {
     // 创建组件实例 app其实就是最大组件。
-    const instance = createComponentInstance(initialVnode, parentComponent)
+    const instance = (initialVnode.component = createComponentInstance(initialVnode, parentComponent) )
     setupComponent(instance)
     setupRenderEffect(instance, initialVnode, container, anchor)
   }
   // 更新 effect
   function setupRenderEffect(instance: any, initialVnode, container, anchor) {
     // 使用 effect去包裹，在effect中传入函数
-    effect(() => {
+   instance.update = effect(() => {
       // vnode -> patch
       // vnode -> element -> mountElement
       // 我们在每次更新的时候都回去创建一个新的，所以需要进新对比
@@ -109,14 +126,30 @@ export function createRenderer(options) {
         instance.isMount = true
       } else {
         // 对比两个树
+        const {next, vnode } = instance
+        if(next) {
+          // 更新el
+          next.el = vnode.el
+          updateComponentPreRender(instance, next)
+
+        }
         const { proxy } = instance
         const prevSubTree = instance.subTree
         const subTree = instance.render.call(proxy)
         instance.subTree = subTree
+        // 处理组件更新
+        // 需要一个更新以后的 vnode
         patch(prevSubTree, subTree, container, instance, anchor)
         // if(subTree !== prevSubTree)
       }
     })
+  }
+
+  function updateComponentPreRender(insatnce, nextVnode) {
+    // 需要更新实例对象上的 props
+    insatnce.vnode = nextVnode
+    insatnce.next = null
+    insatnce.props = nextVnode.props
   }
 
   function patchElement(n1, n2, container, parentComponent, anchor) {
@@ -296,8 +329,9 @@ export function createRenderer(options) {
       const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap)  : []// [1, 2]
       // 对比去操作。倒叙对比，因为 inset 需要一个稳定的 元素，所以从最后一个开始
       // 需要2个子针， 一个标记 [e,c,d] 中的位置，一个标记 j 最长子序列的标记
-      //  [e, c, d ]
-      // s2 = 2 ,  i = 2
+      // a b  [c, d ,e ] f g-> a , b,  [e, d , c] f g
+      //  2 3 4
+      // [ 1, 2 ]
       let j = increasingNewIndexSequence.length - 1
       for (let i = toBePatched - 1; i >= 0; i--) {
         const nextIndex = i + s2
