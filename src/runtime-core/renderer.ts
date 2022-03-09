@@ -3,6 +3,7 @@ import { ShapeFlags } from "../shared/shapeFlags"
 import { createComponentInstance, setupComponent } from "./component"
 import { shouldUpdateComponent } from "./componentUpdateUtils"
 import { createAppAPI } from "./createApp"
+import { queueJobs } from "./scheduler"
 import { Fragment, Text } from "./vnode"
 
 
@@ -66,10 +67,13 @@ export function createRenderer(options) {
 
   function updateComponent (n1, n2) {
     // 更新， 调用 update
+    const instance = (n2.component = n1.component)
     if(shouldUpdateComponent(n1, n2)) {
-      const instance = (n2.component = n1.component)
       instance.next = n2
       instance.update()
+    } else {
+      n2.el = n1.el
+      n2.vnode = n2
     }
 
 
@@ -113,6 +117,7 @@ export function createRenderer(options) {
   function setupRenderEffect(instance: any, initialVnode, container, anchor) {
     // 使用 effect去包裹，在effect中传入函数
    instance.update = effect(() => {
+      console.log('update')
       // vnode -> patch
       // vnode -> element -> mountElement
       // 我们在每次更新的时候都回去创建一个新的，所以需要进新对比
@@ -131,7 +136,6 @@ export function createRenderer(options) {
           // 更新el
           next.el = vnode.el
           updateComponentPreRender(instance, next)
-
         }
         const { proxy } = instance
         const prevSubTree = instance.subTree
@@ -142,7 +146,14 @@ export function createRenderer(options) {
         patch(prevSubTree, subTree, container, instance, anchor)
         // if(subTree !== prevSubTree)
       }
-    })
+    },
+    {
+      scheduler(){
+        console.log('upadte--scheduler')
+        queueJobs(instance.update)
+      }
+    }
+    )
   }
 
   function updateComponentPreRender(insatnce, nextVnode) {
