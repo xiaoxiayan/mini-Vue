@@ -32,6 +32,11 @@ function parseChildren(context) {
       node = parseElement(context)
     }
   }
+
+  if (!node) {
+    node = parseText(context)
+
+  }
   nodes.push(node)
   return  nodes
 }
@@ -46,7 +51,7 @@ function parseInterpolation(context) {
   // 计算出中间的长度，然后截取
   const rawContentLength = closeIndex - openDelimiter.length
 
-  const rawcontent =  context.sourse.slice(0, rawContentLength)
+  const rawcontent =  parseTextData(context, rawContentLength)
   const content = rawcontent.trim()
   // 然后继续推进
 
@@ -67,7 +72,6 @@ function parseInterpolation(context) {
 function parseElement(context) {
   const element = parseTag(context, TagType.Start)
   parseTag(context, TagType.End)
-  console.log('-================', context.sourse)
   return element
 }
 
@@ -85,3 +89,18 @@ function parseTag(context: any, type: TagType) {
     }
 }
 
+function parseText(context: any): any {
+  // 推进， 删除
+  const content = parseTextData(context, context.sourse.length)
+  console.log(context.sourse.length);
+  return {
+    type: NodeTypes.TEXT,
+    content
+  }
+
+}
+function parseTextData(context, length) {
+  const content = context.sourse.slice(0, length)
+  advanceBy(context, length)
+  return content
+}
