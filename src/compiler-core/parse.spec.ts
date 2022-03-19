@@ -37,9 +37,10 @@ describe('text', () => {
   })
 })
 
-test('hello, word', () => {
+test.only('hello, word', () => {
   // const ast = baseParse('<div>hi,{{message}}</div>')
   const ast = baseParse('<div><p>hihi</p>{{message}}</div>')
+
   expect(ast.children[0]).toStrictEqual({
     type: NodeTypes.ELEMENT,
     tag: 'div',
