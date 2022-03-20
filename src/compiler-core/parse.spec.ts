@@ -37,7 +37,7 @@ describe('text', () => {
   })
 })
 
-test.only('hello, word', () => {
+test('hello, word', () => {
   // const ast = baseParse('<div>hi,{{message}}</div>')
   const ast = baseParse('<div><p>hihi</p>{{message}}</div>')
 
@@ -63,4 +63,10 @@ test.only('hello, word', () => {
     ]
 
   })
+})
+
+test('show throw error when lack end tag', () => {
+  expect(() => {
+    baseParse("<div><span></div>")
+  }).toThrow('缺少结束标签:span')
 })

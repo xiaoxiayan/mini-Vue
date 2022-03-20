@@ -6,7 +6,7 @@ const enum TagType {
 
 export function baseParse(content: string) {
   const context = createParseContext(content)
-  return createRoot(parseChildren(context, ''))
+  return createRoot(parseChildren(context, []))
 }
 // 抽离对象
 
@@ -21,18 +21,18 @@ function createRoot(children) {
     children
   }
 }
-function parseChildren(context, endTag) {
+// ancestors 祖先，收集 标签
+function parseChildren(context, ancestors) {
   const nodes: any = []
-  while (!isEnd(context, endTag)) {
+  while (!isEnd(context, ancestors)) {
   let node
   const s = context.sourse
-  console.log('parseChildren----', s)
   // 需要循环取调用解析，直到没有值。
     if (s.startsWith('{{')) {
       node = parseInterpolation(context)
     } else if (s[0] === '<') {
       if (/[a-z]/i.test(s[1])) {
-        node = parseElement(context)
+        node = parseElement(context, ancestors)
       }
     }
     if (!node) {
@@ -70,14 +70,27 @@ function advanceBy(context: any, length: number) {
   context.sourse = context.sourse.slice(length)
 }
 
-function parseElement(context) {
+function parseElement(context, ancestors) {
   const element: any = parseTag(context, TagType.Start)
-  element.children = parseChildren(context, element.tag);
-  parseTag(context, TagType.End)
+  // 收集出现过的标签
+  ancestors.push(element)
+  element.children = parseChildren(context, ancestors);
+  // 弹出推进过的 标签
+  ancestors.pop()
+  // 需要判断一下， ancestors 和 当前的 标签相同才 推进。
+  console.log('element.tag----', element.tag)
+  console.log('context.sourse----', context.sourse)
+  if(startsWithEndTagOpen (context.sourse, element.tag)) {
+    parseTag(context, TagType.End)
+  } else {
+      throw new Error(`缺少结束标签:${element.tag}`)
+  }
   return element
 }
-
-function parseTag(context: any, type: TagType) {
+function startsWithEndTagOpen (sourse, tag) {
+  return sourse.startsWith('</') && sourse.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase()
+}
+function parseTag (context: any, type: TagType) {
   // 1.解析。tag 。正则
   const match: any = /^<\/?([a-z]*)/i.exec(context.sourse)
   console.log('parseTag', context)
@@ -95,7 +108,7 @@ function parseTag(context: any, type: TagType) {
 function parseText(context: any): any {
   // 推进， 删除
   let endIndex = context.sourse.length
-  let endTokens = ['{{', '<']
+  let endTokens = ['<', '{{']
   for(let i = 0; i < endTokens.length; i++) {
     const index = context.sourse.indexOf(endTokens[i])
     if (index !== -1 && index < endIndex) {
@@ -114,14 +127,18 @@ function parseTextData(context, length) {
   advanceBy(context, length)
   return content
 }
-function isEnd(context: any, parentTag) {
+function isEnd(context: any, ancestors) {
   const s = context.sourse
-  // 2. 遇到结束标签的时候
-  if (parentTag && s.startsWith(`</${parentTag}>`)) {
-    return true
+  // 2. 遇到结束标签的时候 , 循环收集过的 ancestors， 如果有相同的就跳出循环，防止死循环
+
+    if ( s.startsWith('</')) {
+      for(let i = ancestors.length - 1 ; i >= 0; i-- ) {
+        const tag = ancestors[i].tag
+        if (startsWithEndTagOpen(s, tag))
+           return true
+        }
   }
   // 1. sourse 有值的时候
   return !s
-
 }
 
