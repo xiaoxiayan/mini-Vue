@@ -3,10 +3,10 @@ export const Fragment = Symbol('Fragment')  // slot 的类型
 export const Text = Symbol('Text')
 
 export function createVNode(type, props?, children?) {
-
   const vnode = {
     type,
     props,
+    key:  props && props.key? props.key : null ,
     shapeFlag: getShapFlag(type),
     children
   }
@@ -21,8 +21,6 @@ export function createVNode(type, props?, children?) {
       vnode.shapeFlag !== ShapeFlags.SLOT_CHILDREN
     }
   }
-  console.log('vnode->', vnode)
-
   return vnode
 }
 
