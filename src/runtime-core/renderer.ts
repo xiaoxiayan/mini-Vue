@@ -92,7 +92,6 @@ export function createRenderer(options) {
       mountChildren(vnode.children, el, parentComponent, anchor)
     }
     const { props } = vnode
-    console.log('mountElement--', props)
     for (const key in props) {
       let val = props[key]
       // TODO 如果 class是个数组

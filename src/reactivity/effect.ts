@@ -67,7 +67,6 @@ export function track (target, key) {
         dep = new Set()
         depsMap.set(key, dep)
     }
-    console.log('get初始化设置响应式对象')
     trackEffect(dep)
     // const dep = new Set()
 }
@@ -77,7 +76,6 @@ export function trackEffect(dep) {
     if(dep.has(activeEffect)) return
     dep.add(activeEffect)
     activeEffect.deps.push(dep)
-    console.log('get.初始化的时候收集的依赖--', dep)
 }
 
 
@@ -89,12 +87,10 @@ export function isTracking() {
 export function trigger (target, key){
     let depsMap = targetMap.get(target)
     let dep = depsMap.get(key)
-    console.log('更新', dep)
     triggerEffects(dep)
 }
 
 export function triggerEffects (dep) {
-    console.log('响应式对象改变触发更新---')
     for(const effect of dep) {
         if(effect.scheduler){
             effect.scheduler()
@@ -106,8 +102,8 @@ export function triggerEffects (dep) {
 
 // 依赖收集
 export function effect (fn, options:any = {}) {
+    console.log('触发了effect')
     // fn
-    console.log('effect---初始化，把更新的逻辑收集进入', fn)
     // 在dom初始化的时候收集依赖 instance.update = effect ,
     // 返回一个 runner -> 也就是返回一个
     const _effect = new ReactiveEffect(fn, options.scheduler)

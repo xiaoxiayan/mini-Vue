@@ -61,7 +61,6 @@ function setupStatefulComponet(instance: any) {
 
 function handleSetupResult( instance, setupResult: any) {
   // fn ,obj
-  console.log('handleSetupResult--')
   if(typeof setupResult === 'object') {
     //   包裹一下，使得ref 在使用的时候， 直接获取到 proxyRefs
     instance.setupState = proxyRefs(setupResult)
