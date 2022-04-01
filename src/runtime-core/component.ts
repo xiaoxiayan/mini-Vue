@@ -26,6 +26,7 @@ export function createComponentInstance(vnode: any, parent) {
   return component
 }
 export function setupComponent(instance: any) {
+  console.log('初始化具体组件')
   // TODO
   initProps(instance, instance.vnode.props)
   // TODO
@@ -35,6 +36,7 @@ export function setupComponent(instance: any) {
 }
 
 function setupStatefulComponet(instance: any) {
+  console.log('初始化一个有状态的 component')
   const Component = instance.type
   const { setup } = Component
   // 设置一个代理对象，绑定到render上 ，让render的时候可以获取到变量,所有在 render中的 get操作都会被代理。
@@ -43,7 +45,7 @@ function setupStatefulComponet(instance: any) {
     {_: instance},
     componentPublicInstance
    )
-  // v3 ，判断是否有核心的数据函数 setup
+  // v3 ，判断是否有核心的数据函数 setupupdateComponent
   if(setup) {
     // 在 setup 的时候 给 currentInstance 赋值
     setCurrentInstance(instance)

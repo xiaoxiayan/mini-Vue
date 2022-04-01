@@ -1,6 +1,10 @@
 import { effect } from "../effect";
 import { reactive } from "../reactive";
+<<<<<<< HEAD
 import { ref, isRef, unRef, proxyRefs } from '../ref';
+=======
+import { ref  } from '../ref_review';
+>>>>>>> branchname
 
 describe('ref', () => {
   it('happy path', () => {
@@ -20,7 +24,7 @@ describe('ref', () => {
     a.value = 2
     expect(calls).toBe(2)
     expect(dummy).toBe(2)
-    // 再次设置 一样的值。不会再触发
+    // 再次设置 一样的值。不会再触发 branchName 分支
     a.value = 2
     expect(calls).toBe(2)
     expect(dummy).toBe(2)
@@ -33,11 +37,16 @@ describe('ref', () => {
     effect(() => {
       dummy = a.value.count;
     })
+    console.log('a============', a)
     expect(dummy).toBe(1)
     a.value.count = 2
     expect(dummy).toBe(2)
   })
+<<<<<<< HEAD
   it('isRef', () => {
+=======
+  it.skip('isRef', () => {
+>>>>>>> branchname
     const a = ref(1)
     const user = reactive({
       age: 1
@@ -46,7 +55,11 @@ describe('ref', () => {
     expect(isRef(1)).toBe(false)
     expect(isRef(user)).toBe(false)
   })
+<<<<<<< HEAD
   it('unRef', () => {
+=======
+  it.skip('unRef', () => {
+>>>>>>> branchname
     const a = ref(1)
     const user = reactive({
       age: 1
@@ -55,7 +68,11 @@ describe('ref', () => {
     expect(unRef(1)).toBe(1)
   })
 
+<<<<<<< HEAD
   it('proxyRefs', () => {
+=======
+  it.skip('proxyRefs', () => {
+>>>>>>> branchname
     // 在 setup() return { ref } 的时候。进行了proxyRefs 使得我们template 中使用 ref对象可以不用 ref.value
     const user = {
       age:  ref(10),

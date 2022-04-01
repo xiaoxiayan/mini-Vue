@@ -17,12 +17,20 @@ export function createRenderer(options) {
 
   } = options
   function render(vnode, container) {
+<<<<<<< HEAD
+=======
+    console.log('render---渲染', )
+>>>>>>> branchname
     // 初始化
     // 调用 patch， 方便后续的递归
     patch(null, vnode, container, null, null)
   }
 
   function patch(n1, n2: any, container: any, parentComponent, anchor) {
+<<<<<<< HEAD
+=======
+    console.log('patch---')
+>>>>>>> branchname
     // 处理组件
     // 判断类型 类型主要分为两种，一种是 component 类型
     // render { component } vue文件都是组件类型
@@ -117,7 +125,6 @@ export function createRenderer(options) {
   function setupRenderEffect(instance: any, initialVnode, container, anchor) {
     // 使用 effect去包裹，在effect中传入函数
    instance.update = effect(() => {
-      console.log('update')
       // vnode -> patch
       // vnode -> element -> mountElement
       // 我们在每次更新的时候都回去创建一个新的，所以需要进新对比

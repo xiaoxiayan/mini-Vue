@@ -32,7 +32,6 @@ export function isProxy(value) {
 
 function createReactiveObject(target: any, baseHandlers) {
   if(!isObject(target)) {
-    console.warn(`target ${target} must is Object`)
     return target
   }
   return new Proxy(target, baseHandlers)
