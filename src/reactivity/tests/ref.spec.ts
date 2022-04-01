@@ -20,7 +20,7 @@ describe('ref', () => {
     a.value = 2
     expect(calls).toBe(2)
     expect(dummy).toBe(2)
-    // 再次设置 一样的值。不会再触发
+    // 再次设置 一样的值。不会再触发 branchName 分支
     a.value = 2
     expect(calls).toBe(2)
     expect(dummy).toBe(2)
