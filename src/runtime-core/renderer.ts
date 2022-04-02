@@ -17,20 +17,14 @@ export function createRenderer(options) {
 
   } = options
   function render(vnode, container) {
-<<<<<<< HEAD
-=======
     console.log('render---渲染', )
->>>>>>> branchname
     // 初始化
     // 调用 patch， 方便后续的递归
     patch(null, vnode, container, null, null)
   }
 
   function patch(n1, n2: any, container: any, parentComponent, anchor) {
-<<<<<<< HEAD
-=======
     console.log('patch---')
->>>>>>> branchname
     // 处理组件
     // 判断类型 类型主要分为两种，一种是 component 类型
     // render { component } vue文件都是组件类型

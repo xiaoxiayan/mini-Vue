@@ -20,13 +20,11 @@ describe('effect', () => {
     expect(nextAge).toBe(11)
     user.age++
     //update
-
-
     // expect(nextAge).toBe(12)
     // expect(newName).toBe('zhangsan2')
 
   })
-  it('should return runner when call effect  ', () => {
+  it.skip('should return runner when call effect  ', () => {
     // 1. effect (fn) -> function (runner) -> fn -> return
     // 执行 effect的时候返回一个 runner函数 -> 调用 runner的时候,再次调用 effect传入的 fn 并且返回 fn 的返回值
     let foo = 10
@@ -40,7 +38,7 @@ describe('effect', () => {
     expect(r).toBe('foo')
 
   })
-  it("scheduler", () => {
+  it.skip("scheduler", () => {
     // 1. effect 传入 scheduler函数
     // 2. 当 effect 初始化的时候，还是调用的 fn ,不会调用 scheduler
     // 3. 当 响应式对象 set update 的时候 会去调用 scheduler里面的函数， 不会执行 fn
@@ -70,7 +68,7 @@ describe('effect', () => {
     // // should have run
     expect(dummy).toBe(2);
   });
-  it('stop', () => {
+  it.skip('stop', () => {
     let dummy;
     const obj = reactive({ prop: 1 })
     const runner = effect(() => {
@@ -84,7 +82,7 @@ describe('effect', () => {
     runner()
     expect(dummy).toBe(3)
   })
-  it('Onstop', () => {
+  it.skip('Onstop', () => {
     // 拓展 ，支持 用户自定义一些 fn
     const obj = reactive({
       foo: 1

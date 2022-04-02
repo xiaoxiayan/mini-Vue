@@ -24,6 +24,7 @@ export class ReactiveEffect
         activeEffect = this
         const result = this._fn()
         // reset
+        console.log('ReactiveEffect==', result)
         shouldTrack = false
         return result
     }
@@ -102,14 +103,10 @@ export function triggerEffects (dep) {
 
 // 依赖收集
 export function effect (fn, options:any = {}) {
-<<<<<<< HEAD
-    // fn
-=======
     console.log('触发了effect')
     // fn
     // 在dom初始化的时候收集依赖 instance.update = effect ,
     // 返回一个 runner -> 也就是返回一个
->>>>>>> branchname
     const _effect = new ReactiveEffect(fn, options.scheduler)
     // options
     // _effect.onStop = options.onStop
@@ -121,10 +118,6 @@ export function effect (fn, options:any = {}) {
     // runner 相当于 effect 返回的 _fn ，然后再把 当前_effect 挂载在return 出去
     const runner: any = _effect.run.bind(_effect)
     runner.effect = _effect
-<<<<<<< HEAD
-    
-=======
->>>>>>> branchname
     return runner
 }
 
