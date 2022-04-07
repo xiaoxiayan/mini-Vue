@@ -17,7 +17,7 @@ export function createRenderer(options) {
 
   } = options
   function render(vnode, container) {
-    console.log('render---渲染', )
+    console.log('render---渲染',)
     // 初始化
     // 调用 patch， 方便后续的递归
     patch(null, vnode, container, null, null)
@@ -58,7 +58,7 @@ export function createRenderer(options) {
     }
   }
   function processComponent(n1, n2: any, container: any, parentComponent, anchor) {
-    if(!n1) {
+    if (!n1) {
       // 初始化 component
       mountComponent(n2, container, parentComponent, anchor)
     } else {
@@ -67,10 +67,10 @@ export function createRenderer(options) {
     }
   }
 
-  function updateComponent (n1, n2) {
+  function updateComponent(n1, n2) {
     // 更新， 调用 update
     const instance = (n2.component = n1.component)
-    if(shouldUpdateComponent(n1, n2)) {
+    if (shouldUpdateComponent(n1, n2)) {
       instance.next = n2
       instance.update()
     } else {
@@ -111,14 +111,14 @@ export function createRenderer(options) {
 
   function mountComponent(initialVnode: any, container: any, parentComponent, anchor) {
     // 创建组件实例 app其实就是最大组件。
-    const instance = (initialVnode.component = createComponentInstance(initialVnode, parentComponent) )
+    const instance = (initialVnode.component = createComponentInstance(initialVnode, parentComponent))
     setupComponent(instance)
     setupRenderEffect(instance, initialVnode, container, anchor)
   }
   // 更新 effect
   function setupRenderEffect(instance: any, initialVnode, container, anchor) {
     // 使用 effect去包裹，在effect中传入函数
-   instance.update = effect(() => {
+    instance.update = effect(() => {
       // vnode -> patch
       // vnode -> element -> mountElement
       // 我们在每次更新的时候都回去创建一个新的，所以需要进新对比
@@ -132,8 +132,8 @@ export function createRenderer(options) {
         instance.isMount = true
       } else {
         // 对比两个树
-        const {next, vnode } = instance
-        if(next) {
+        const { next, vnode } = instance
+        if (next) {
           // 更新el
           next.el = vnode.el
           updateComponentPreRender(instance, next)
@@ -148,12 +148,12 @@ export function createRenderer(options) {
         // if(subTree !== prevSubTree)
       }
     },
-    {
-      scheduler(){
-        console.log('upadte--scheduler')
-        queueJobs(instance.update)
+      {
+        scheduler() {
+          console.log('upadte--scheduler')
+          queueJobs(instance.update)
+        }
       }
-    }
     )
   }
 
@@ -210,13 +210,96 @@ export function createRenderer(options) {
         // 1.先romve ，在 mount . 简单是实现，性能损耗很大
         // unmountChildren(n1.children)
         //  diff算法
-        patchKeyChildren(c1, c2, container, parentComponent, anchor)
+        patchKeyChildren_Review(c1, c2, container, parentComponent, anchor)
 
       }
       // mountChildren(c2, container, n2)
     }
 
   }
+  function patchKeyChildren_Review(c1, c2, container, parentComponent, anchor) {
+    function isSomeVnodeType(n1, n2) {
+      return n1.type === n2.type && n1.key === n2.key
+    }
+    // 实现案例1， 新的比旧的多，
+    //  (a b) c
+    //  (a b) d e
+    let i = 0, e1 = c1.length - 1, e2 = c2.length - 1
+    // 思路： 先从左边到右边，走i 找出 开头， 然后从右侧走， 找到 右边指针的范围，
+    // 循环 只要 i 小与 e1, e2 就一直走，对比出不同的就停下
+    while (i <= e1 && i <= e2) {
+      // 对比如果重复就 ++ 如果不是就 break
+      let oldEl = c1[i]
+      let newEl = c2[i]
+      if (isSomeVnodeType(oldEl, newEl)) {
+        patch(oldEl, newEl, container, parentComponent, anchor)
+      } else {
+        break
+      }
+      i++
+    }
+    // 右侧对比，找出e1, e2 确定一下整体范围
+    // 条件还是 i< e1 和 e2 ,如果 i > e2 就是 旧的比新的长了
+    while (i <=e1 && i <= e2) {
+      let oldEl = c1[e1]
+      let newEl = c2[e2]
+      if (isSomeVnodeType(oldEl, newEl)) {
+        patch(oldEl, newEl, container, parentComponent, anchor)
+      } else {
+        break
+      }
+      e1 --
+      e2 --
+    }
+    // 在查找到范围以后。有以下几种情况
+    // 新的比老的长，
+    // ab
+    // abc
+    if (i > e1) {
+      if (i <= e2) {
+        // 新的比老的长， 需要添加， 也就是 调用 patch（null, n2）
+        //  insertBefore（insertEl, position）
+        //  position 如果是 null , 就是插在最后，如果是有 el，会找到这个el， 插在 el的前面
+        // 如果 下一个节点的位置 ，小于 c2的长度，说明不是一个
+        // 情况1，如果是在 新的节点在右侧， 那么需要添加到 null, 如果是左侧，需要计算出 第一个存在的元素，
+        // 插入到 第一个存在元素的前面
+        //  e2 + 1 就是要插入的节点的前面那个节点
+        // 如果nextPos 小于整体 c2的长度，说明是 在左侧添加，取节点，如果大于，就说明在右侧，null，在末尾添加
+        let nextPos = e2 + 1
+        anchor = nextPos < c2.length ?  c2[nextPos].el : null
+        // 可能有多个节点需要去创建， 循环
+        while (i <= e2) {
+          patch(null, c2[i], container, parentComponent, anchor)
+          // 需要把 i++ 不然就是死循环了
+          i++
+        }
+      }
+    } else if (i > e2) {
+      // 旧的比新的长，删除
+      // 左侧
+      // (a b) c d
+      // (a b)
+      // i = 2 ; e1 = 3, e2 = 1
+      // 右侧
+      // d c a b
+      // a b
+      // i = 0 ; e1 = 1;  e2 = -2
+      // 输入对应的 el, 然后通过父级 去对 el进行一个删除\
+      // 循环删除
+      while (i <= e1) {
+        hostRemove(c1[i].el)
+        i++
+      }
+    } else {
+      // 最后中间对比
+      console.log('需要中间对比，进行替换')
+
+    }
+
+  }
+
+
+
   function patchKeyChildren(c1, c2, container, parentComponent, anchor) {
     // diff
     // 左侧对比, i++ 循环
@@ -227,6 +310,7 @@ export function createRenderer(options) {
     function isSomeVnodeType(n1, n2) {
       return n1.type === n2.type && n1.key === n2.key
     }
+    // 如果不同点再右侧，
     while (i <= e1 && i <= e2) {
       const n1 = c1[i]
       const n2 = c2[i]
@@ -238,7 +322,8 @@ export function createRenderer(options) {
       }
       i++
     }
-    // 右侧对比 定位 e1 ,e2
+    // 右侧对比 定位 e1 ,e2，
+    // 如果不同点再左侧，通过 e1, e2定位 到不同
     while (i <= e1 && i <= e2) {
       const n1 = c1[e1]
       const n2 = c2[e2]

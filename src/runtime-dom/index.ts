@@ -27,7 +27,7 @@ function patchProp(el, key, prevVal, nextVal) {
 function insert(child, parent,anchor ) {
   parent.append(child)
   // 使用锚点添加到对应的位置
-   parent.insertBefore(child, anchor || null )
+  parent.insertBefore(child, anchor || null )
 }
 function remove(child) {
   const parent = child.parentNode
