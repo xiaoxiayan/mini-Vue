@@ -78,8 +78,6 @@ function parseElement(context, ancestors) {
   // 弹出推进过的 标签
   ancestors.pop()
   // 需要判断一下， ancestors 和 当前的 标签相同才 推进。
-  console.log('element.tag----', element.tag)
-  console.log('context.sourse----', context.sourse)
   if(startsWithEndTagOpen (context.sourse, element.tag)) {
     parseTag(context, TagType.End)
   } else {
@@ -93,7 +91,6 @@ function startsWithEndTagOpen (sourse, tag) {
 function parseTag (context: any, type: TagType) {
   // 1.解析。tag 。正则
   const match: any = /^<\/?([a-z]*)/i.exec(context.sourse)
-  console.log('parseTag', context)
   const tag = match[1]
   // 2.推进删除代码
   advanceBy(context, match[0].length)
@@ -116,7 +113,6 @@ function parseText(context: any): any {
     }
   }
   const content = parseTextData(context, endIndex)
-  console.log('parseText', content);
   return {
     type: NodeTypes.TEXT,
     content

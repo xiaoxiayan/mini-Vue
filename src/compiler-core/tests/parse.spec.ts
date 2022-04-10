@@ -1,5 +1,5 @@
-import { NodeTypes } from "./src/ast";
-import { baseParse } from "./src/parse";
+import { NodeTypes } from "../src/ast";
+import { baseParse } from "../src/parse";
 
 describe('parse', () => {
   describe('interpolation', () => {
