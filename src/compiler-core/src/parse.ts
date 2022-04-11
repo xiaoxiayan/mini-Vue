@@ -18,7 +18,8 @@ function createParseContext(content) {
 
 function createRoot(children) {
   return {
-    children
+    children,
+    type: NodeTypes.ROOT
   }
 }
 // ancestors 祖先，收集 标签
