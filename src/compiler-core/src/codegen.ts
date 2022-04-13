@@ -1,5 +1,5 @@
 import { NodeTypes } from "./ast"
-import { helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers"
+import { CREATE_ELEMENT_VNODE, helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers"
 import { transform } from "./transform"
 
 export function generate(ast) {
@@ -41,10 +41,16 @@ function getNode(node: any, context: any) {
       break;
     case NodeTypes.SIMPLE_EXPRESSION:
       getExperssion(node, context)
+      break;
+    case NodeTypes.ELEMENT:
+      genElement(node, context)
+      break;
     default:
       break;
   }
 }
+
+
 function genText(node: any, context: any) {
   const { push } = context
   push(`"${node.content}"`)
@@ -68,7 +74,7 @@ function genInterPolation(node: any, context: any) {
   push(`${helper(TO_DISPLAY_STRING)}(`)
   getNode(node.content, context)
   push(')')
-
+  genggatdd()
 }
 
 function getExperssion(node: any, context: any) {
@@ -76,4 +82,11 @@ function getExperssion(node: any, context: any) {
   const { push } = context
   push(`${node.content}`)
 }
+
+function genElement (node, context) {
+  const { push, helper } = context
+  const { tag } =  node
+  push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}", null, "h1, " + _toDisplayString(_ctx.mewssage))`)
+}
+
 

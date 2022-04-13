@@ -19,7 +19,7 @@ function traverseNode(node: any, context) {
   const nodeTransforms = context.nodeTransforms
   for(let i = 0; i< nodeTransforms.length; i++) {
     const transform = nodeTransforms[i]
-    transform(node)
+    transform(node, context)
   }
   // 如果节点是 interpolation 插入节点，我们需要挂一个 helpers 的一个相关函数给 codegen，
   // 给 context去设置一个  helpers
@@ -31,7 +31,6 @@ function traverseNode(node: any, context) {
     case NodeTypes.ELEMENT:
       traverseChilren(node, context)
       break;
-
     default:
       break;
   }
