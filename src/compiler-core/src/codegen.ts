@@ -57,7 +57,7 @@ function genNode(node: any, context: any) {
 
 function genText(node: any, context: any) {
   const { push } = context
-  push(`"${node.content}"`)
+  push(`'${node.content}'`)
 }
 
 function createCodegenContext() {
@@ -89,11 +89,13 @@ function getExperssion(node: any, context: any) {
 
 function genElement(node, context) {
   const { push, helper } = context
-  const { tag, children } = node
-  console.log('genElement---', children);
-  push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}", null, `)
-  // 可以先去循环这个children
-  genNode(children, context)
+  const { tag, children, props } = node
+  push(`${helper(CREATE_ELEMENT_VNODE)}(`)
+  // 把假的值都替换成 null, 但是 genNode 只支持一个，改成支持 数组
+  genNodeList(genNullable([tag, props, children]), context)
+
+
+  // genNode(children, context)
   push(')')
   // 创建新的节点类型， 判断是不是连续的 text, 插值
 }
@@ -108,6 +110,27 @@ function genCompoundExpression(node: any, context: any) {
     } else {
       genNode(child, context)
     }
+  }
+}
+
+function genNullable(args: any) {
+  return args.map((arg) => arg || "null")
+}
+
+function genNodeList(nodes, context) {
+  const { push } = context
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    // 如果是 文字节点
+    if (isString(node)) {
+      push(node)
+    } else {
+      genNode(node, context)
+    }
+    if(i < nodes.length - 1) {
+      push(", ")
+    }
+
   }
 }
 
