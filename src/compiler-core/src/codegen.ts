@@ -1,3 +1,4 @@
+import { isString } from "../../shared"
 import { NodeTypes } from "./ast"
 import { CREATE_ELEMENT_VNODE, helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers"
 import { transform } from "./transform"
@@ -12,10 +13,10 @@ export function generate(ast) {
   push(`function ${functionName}(${signature}){`)
   push('return ')
   // 通过 ast 树去获取的 return 内容
-  getNode(ast.codegenNode, context)
+  genNode(ast.codegenNode, context)
   push('}')
   return {
-      code : context.code
+    code: context.code
   }
 }
 
@@ -23,14 +24,14 @@ function genFuncitonPreamble(ast, context) {
   const { push } = context
   const vueBinging = 'vue'
   const aliasHelper = (s) => `${helperMapName[s]}:_${helperMapName[s]}`
-  if(ast.helpers.length > 0) {
+  if (ast.helpers.length > 0) {
     push(`const {${ast.helpers.map(aliasHelper).join(', ')}} = ${vueBinging}`)
   }
   push('\n')
   push('return ')
 }
 
-function getNode(node: any, context: any) {
+function genNode(node: any, context: any) {
   // 区分node类型，去return 不同的内容
   switch (node.type) {
     case NodeTypes.TEXT:
@@ -44,6 +45,9 @@ function getNode(node: any, context: any) {
       break;
     case NodeTypes.ELEMENT:
       genElement(node, context)
+      break;
+    case NodeTypes.COMPUND_EXPRESSION:
+      genCompoundExpression(node, context)
       break;
     default:
       break;
@@ -72,9 +76,9 @@ function createCodegenContext() {
 function genInterPolation(node: any, context: any) {
   const { push, helper } = context
   push(`${helper(TO_DISPLAY_STRING)}(`)
-  getNode(node.content, context)
+  genNode(node.content, context)
   push(')')
-  genggatdd()
+
 }
 
 function getExperssion(node: any, context: any) {
@@ -83,10 +87,27 @@ function getExperssion(node: any, context: any) {
   push(`${node.content}`)
 }
 
-function genElement (node, context) {
+function genElement(node, context) {
   const { push, helper } = context
-  const { tag } =  node
-  push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}", null, "h1, " + _toDisplayString(_ctx.mewssage))`)
+  const { tag, children } = node
+  console.log('genElement---', children);
+  push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}", null, `)
+  // 可以先去循环这个children
+  genNode(children, context)
+  push(')')
+  // 创建新的节点类型， 判断是不是连续的 text, 插值
 }
 
+function genCompoundExpression(node: any, context: any) {
+  const { push } = context
+  const children = node.children
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    if (isString(child)) {
+      push(child)
+    } else {
+      genNode(child, context)
+    }
+  }
+}
 

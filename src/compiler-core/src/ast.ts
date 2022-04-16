@@ -3,5 +3,6 @@ export enum NodeTypes {
   SIMPLE_EXPRESSION,
   ELEMENT,
   TEXT,
-  ROOT
+  ROOT,
+  COMPUND_EXPRESSION
 }

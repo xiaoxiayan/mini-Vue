@@ -17,9 +17,12 @@ export function transform(root, options = {}) {
 function traverseNode(node: any, context) {
   // 取出插入的 方法， 调用。
   const nodeTransforms = context.nodeTransforms
+  const exitFns: any = []
+
   for(let i = 0; i< nodeTransforms.length; i++) {
     const transform = nodeTransforms[i]
-    transform(node, context)
+    const onExit = transform(node, context)
+    if(onExit) exitFns.push(onExit)
   }
   // 如果节点是 interpolation 插入节点，我们需要挂一个 helpers 的一个相关函数给 codegen，
   // 给 context去设置一个  helpers
@@ -34,8 +37,10 @@ function traverseNode(node: any, context) {
     default:
       break;
   }
-
-  // 深度优先搜索，遍历树的子节点，
+  let i = exitFns.length
+  while(i--) {
+    exitFns[i]()
+  }
 
 }
 
@@ -62,6 +67,12 @@ function createTransformContext(root: any, options: any) {
 }
 
 function createCodegenNode(root: any) {
-  root.codegenNode = root.children[0]
+  // 如果类型是 element 的， 我们直接使用 element上面的 codegenNode
+  const child = root.children[0]
+  if(child.type === NodeTypes.ELEMENT) {
+    root.codegenNode = child.codegenNode
+  } else {
+      root.codegenNode = root.children[0]
+  }
 }
 
