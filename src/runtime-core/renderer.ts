@@ -17,7 +17,7 @@ export function createRenderer(options) {
 
   } = options
   function render(vnode, container) {
-    console.log('render---渲染',)
+    console.log('render---渲染', container)
     // 初始化
     // 调用 patch， 方便后续的递归
     patch(null, vnode, container, null, null)
@@ -126,6 +126,7 @@ export function createRenderer(options) {
       if (!instance.isMount) {
         // 初始化
         const { proxy } = instance
+        // call 第一个参数是，this，  第二个参数就可以当做 传入 render的内容， 相当于 _ctx
         const subTree = (instance.subTree = instance.render.call(proxy, proxy))
         patch(null, subTree, container, instance, anchor)
         initialVnode.el = subTree.el
