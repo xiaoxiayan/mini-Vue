@@ -1,4 +1,3 @@
-export * from './reactivity';
 export * from './runtime-dom';
 import {registerRuntimeCompiler} from './runtime-dom'
 
