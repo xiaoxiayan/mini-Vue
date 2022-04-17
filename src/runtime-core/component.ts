@@ -71,6 +71,12 @@ function handleSetupResult( instance, setupResult: any) {
 
 function finishComponentSetup(instance) {
   const Component = instance.type
+  if(compiler && !Component.render) {
+    console.log('compiler==',  compiler)
+    if(Component.template) {
+      Component.render = compiler(Component.template)
+    }
+  }
   instance.render = Component.render
 }
 //  定义一个全局变量  currentInstance  去获取当前的 实例对象 type。
@@ -81,4 +87,10 @@ export function getCurrentInstance () {
 // 使用函数包裹，可以方便后续 debugger
 function setCurrentInstance (instance) {
   currentInstance = instance
+}
+
+let compiler;
+
+export function registerRuntimeCompiler(_compiler) {
+  compiler = _compiler
 }

@@ -126,7 +126,7 @@ export function createRenderer(options) {
       if (!instance.isMount) {
         // 初始化
         const { proxy } = instance
-        const subTree = (instance.subTree = instance.render.call(proxy))
+        const subTree = (instance.subTree = instance.render.call(proxy, proxy))
         patch(null, subTree, container, instance, anchor)
         initialVnode.el = subTree.el
         instance.isMount = true
@@ -140,7 +140,7 @@ export function createRenderer(options) {
         }
         const { proxy } = instance
         const prevSubTree = instance.subTree
-        const subTree = instance.render.call(proxy)
+        const subTree = instance.render.call(proxy, proxy)
         instance.subTree = subTree
         // 处理组件更新
         // 需要一个更新以后的 vnode
