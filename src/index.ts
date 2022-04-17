@@ -7,7 +7,6 @@ import * as runtimeDom from './runtime-dom'
 function compileToFunction(template) {
   const { code } = baseCompile(template)
   const render = new Function("vue", code)(runtimeDom)
-  console.log('==render', render)
   return  render
 
 
