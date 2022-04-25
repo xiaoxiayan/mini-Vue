@@ -211,7 +211,8 @@ export function createRenderer(options) {
         // 1.先romve ，在 mount . 简单是实现，性能损耗很大
         // unmountChildren(n1.children)
         //  diff算法
-        patchKeyChildren_Review(c1, c2, container, parentComponent, anchor)
+        // patchKeyChildren_Review(c1, c2, container, parentComponent, anchor)
+        patchKeyChildren(c1, c2, container, parentComponent, anchor)
 
       }
       // mountChildren(c2, container, n2)
@@ -423,9 +424,10 @@ export function createRenderer(options) {
           patched++
         }
       }
+      debugger
       // 前面的步骤已经删除完毕，剩下是新增 和 乱序的内容
       const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap)  : []// [1, 2]
-      // 对比去操作。倒叙对比，因为 inset 需要一个稳定的 元素，所以从最后一个开始
+      // 对比去操作。倒叙对比，因为 inset 需要一个稳定的元素，所以从最后一个开始
       // 需要2个子针， 一个标记 [e,c,d] 中的位置，一个标记 j 最长子序列的标记
       // a b  [c, d ,e ] f g-> a , b,  [e, d , c] f g
       //  2 3 4
