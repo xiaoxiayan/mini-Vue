@@ -24,7 +24,6 @@ export class ReactiveEffect
         activeEffect = this
         const result = this._fn()
         // reset
-        console.log('ReactiveEffect==', result)
         shouldTrack = false
         return result
     }

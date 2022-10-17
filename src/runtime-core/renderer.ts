@@ -17,7 +17,6 @@ export function createRenderer(options) {
 
   } = options
   function render(vnode, container) {
-    console.log('render---渲染', container)
     // 初始化
     // 调用 patch， 方便后续的递归
     patch(null, vnode, container, null, null)
@@ -242,7 +241,7 @@ export function createRenderer(options) {
     }
     // 右侧对比，找出e1, e2 确定一下整体范围
     // 条件还是 i< e1 和 e2 ,如果 i > e2 就是 旧的比新的长了
-    while (i <=e1 && i <= e2) {
+    while (i <= e1 && i <= e2) {
       let oldEl = c1[e1]
       let newEl = c2[e2]
       if (isSomeVnodeType(oldEl, newEl)) {
@@ -250,8 +249,8 @@ export function createRenderer(options) {
       } else {
         break
       }
-      e1 --
-      e2 --
+      e1--
+      e2--
     }
     // 在查找到范围以后。有以下几种情况
     // 新的比老的长，
@@ -268,7 +267,7 @@ export function createRenderer(options) {
         //  e2 + 1 就是要插入的节点的前面那个节点
         // 如果nextPos 小于整体 c2的长度，说明是 在左侧添加，取节点，如果大于，就说明在右侧，null，在末尾添加
         let nextPos = e2 + 1
-        anchor = nextPos < c2.length ?  c2[nextPos].el : null
+        anchor = nextPos < c2.length ? c2[nextPos].el : null
         // 可能有多个节点需要去创建， 循环
         while (i <= e2) {
           patch(null, c2[i], container, parentComponent, anchor)
@@ -426,7 +425,7 @@ export function createRenderer(options) {
       }
       debugger
       // 前面的步骤已经删除完毕，剩下是新增 和 乱序的内容
-      const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap)  : []// [1, 2]
+      const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap) : []// [1, 2]
       // 对比去操作。倒叙对比，因为 inset 需要一个稳定的元素，所以从最后一个开始
       // 需要2个子针， 一个标记 [e,c,d] 中的位置，一个标记 j 最长子序列的标记
       // a b  [c, d ,e ] f g-> a , b,  [e, d , c] f g
@@ -437,7 +436,7 @@ export function createRenderer(options) {
         const nextIndex = i + s2
         const nextChild = c2[nextIndex]
         const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : null
-        if(newIndexToOldIndexMap[i] === 0) {
+        if (newIndexToOldIndexMap[i] === 0) {
           // 创建
           patch(null, nextChild, container, parentComponent, anchor)
         }
