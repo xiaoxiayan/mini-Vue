@@ -50,6 +50,7 @@ function cleanupEffect (effect) {
 // targetMap 用于储存依赖
 const targetMap = new Map()
 export function track (target, key) {
+
     if(!isTracking()) return
     // 依赖收集 函数 用于 后面响应数据，更新数据
     // 先取出 全部的 target，
@@ -58,6 +59,7 @@ export function track (target, key) {
     if(!depsMap){
         // 初始化的时候需要创建一个大的对象 ，存储全部dep，用map
         depsMap = new Map()
+        console.log('LLLxxP__设置依赖___', target, key, depsMap);
         targetMap.set(target, depsMap)
     }
     let dep = depsMap.get(key)
@@ -102,7 +104,7 @@ export function triggerEffects (dep) {
 
 // 依赖收集
 export function effect (fn, options:any = {}) {
-    console.log('触发了effect')
+    console.log('触发了effect==')
     // fn
     // 在dom初始化的时候收集依赖 instance.update = effect ,
     // 返回一个 runner -> 也就是返回一个

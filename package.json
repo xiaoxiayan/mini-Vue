@@ -4,11 +4,11 @@
   "main": "lib/ggBond-mini-vue.cjs.js",
   "module": "lib/ggBond-mini-vue.esm.js",
   "repository": "https://github.com/xiaoxiayan/mini-Vue.git",
-  "author": "v_qiwulv <v_qiwulv@tencent.com>",
+  "author": "xiaoxiayan <a690150618@qq.com>",
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "build": "rollup -c rollup.config.js"
+    "build": "rollup -c -w rollup.config.js"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
@@ -19,6 +19,9 @@
     "babel-jest": "^27.3.1",
     "jest": "^27.3.1",
     "rollup": "^2.60.1",
+    "rollup-plugin-hot": "^0.1.1",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-serve": "^1.1.1",
     "tslib": "^2.3.1",
     "typescript": "^4.5.2"
   }

@@ -18,7 +18,7 @@ class RefImpl {
   }
 
   get value() {
-    // 需要收集依赖 track
+    // 需要收集依赖
     trackRefValue(this)
     return this._value
   }

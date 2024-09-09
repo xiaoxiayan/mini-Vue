@@ -16,7 +16,6 @@ export function queueJobs (job) {
 function queueFlush () {
   if(isFlushPending) return
   isFlushPending = true
-  console.log('queueFlush')
   // 创建一个微任务，promise ，
   nextTick(flushJobs)
 }

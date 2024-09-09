@@ -23,7 +23,6 @@ export function createRenderer(options) {
   }
 
   function patch(n1, n2: any, container: any, parentComponent, anchor) {
-    console.log('patch---')
     // 处理组件
     // 判断类型 类型主要分为两种，一种是 component 类型
     // render { component } vue文件都是组件类型
@@ -117,6 +116,7 @@ export function createRenderer(options) {
   // 更新 effect
   function setupRenderEffect(instance: any, initialVnode, container, anchor) {
     // 使用 effect去包裹，在effect中传入函数
+    console.log('LLLxxP__setupRenderEffect__');
     instance.update = effect(() => {
       // vnode -> patch
       // vnode -> element -> mountElement
@@ -423,7 +423,6 @@ export function createRenderer(options) {
           patched++
         }
       }
-      debugger
       // 前面的步骤已经删除完毕，剩下是新增 和 乱序的内容
       const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap) : []// [1, 2]
       // 对比去操作。倒叙对比，因为 inset 需要一个稳定的元素，所以从最后一个开始

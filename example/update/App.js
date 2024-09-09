@@ -53,6 +53,7 @@ export const App = {
       },
       [
         h('div', {}, 'count:' + this.count), //依赖收集
+        h('div', {}, 'prop-foo:' + this.props.foo),
         h(
           'button',
           {
